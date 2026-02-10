@@ -9,6 +9,8 @@ import ArticleDetails from '../pages/ArticleDetails'
 import BookDetails from '../pages/BookDetails'
 import Events from '../pages/Events'
 import Contact from '../pages/Contact'
+import AllBlogs from '../pages/AllBlogs'
+import CollectionPage from '../pages/CollectionPage'
 import AdminLayout from '../admin/AdminLayout'
 import Dashboard from '../admin/Dashboard'
 import AdminBooks from '../admin/Books'
@@ -21,6 +23,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
+        <Route path="all-blogs" element={<AllBlogs />} />
         <Route path="about" element={<About />} />
         <Route path="knowledge-hub" element={<KnowledgeHub />} />
         <Route path="library" element={<DigitalLibrary />} />
@@ -29,6 +32,8 @@ function AppRoutes() {
         <Route path="library/:id" element={<BookDetails />} />
         <Route path="events" element={<Events />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="contact-form" element={<Contact />} />
+        <Route path=":collection" element={<CollectionPage />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
