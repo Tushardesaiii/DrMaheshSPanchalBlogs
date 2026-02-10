@@ -16,7 +16,7 @@ const NAV_GROUPS = [
   },
   {
     title: "Connect",
-    links: ["Contact Form", "Social Links"]
+    links: ["Contact Form", "Social Links", "Profile"]
   }
 ];
 
@@ -29,8 +29,8 @@ export default function Navbar() {
         
         {/* Compact Logo */}
         <NavLink to="/" className="group flex items-center gap-2">
-          <h1 className="text-2xl font-black uppercase tracking-tighter leading-none">
-            MAHESH<span className="text-[#d9f99d]">SIR</span>
+          <h1 className="text-2xl font-serif italic tracking-tighter leading-none">
+            Dr. Mahesh<span className="text-[#d9f99d]"> Solanki</span>
           </h1>
                </NavLink>
 

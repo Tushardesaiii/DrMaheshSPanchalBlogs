@@ -16,7 +16,7 @@ const NAV_GROUPS = [
   },
   {
     title: "Collaboration",
-    links: ["Contact Form", "Social Links"]
+    links: ["Contact Form", "Social Links", "Profile"]
   }
 ];
 
@@ -29,7 +29,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-400 items-center justify-between px-10 py-14">
         <NavLink to="/" className="group">
           <h1 className="text-6xl font-serif italic tracking-tighter leading-none">
-            Dr. Mahesh<span className="text-[#d9f99d]"> Panchal</span>
+            Dr. Mahesh<span className="text-[#d9f99d]"> Solanki</span>
           </h1>
           <div className="h-1.5 w-24 bg-[#d9f99d] mt-2 group-hover:w-full transition-all duration-500"></div>
         </NavLink>

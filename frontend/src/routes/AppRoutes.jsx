@@ -7,6 +7,7 @@ import AdminLayout from '../admin/AdminLayout'
 // Public Pages
 import Home from '../pages/Home'
 import About from '../pages/About'
+import Profile from '../pages/Profile'
 import KnowledgeHub from '../pages/KnowledgeHub'
 import DigitalLibrary from '../pages/DigitalLibrary'
 import Articles from '../pages/Articles'
@@ -16,6 +17,7 @@ import Events from '../pages/Events'
 import Contact from '../pages/Contact'
 import AllBlogs from '../pages/AllBlogs'
 import CollectionPage from '../pages/CollectionPage'
+import ActivityPage from '../pages/ActivityPage'
 
 // Admin Pages
 import Dashboard from '../admin/Dashboard'
@@ -38,6 +40,7 @@ function AppRoutes() {
         
         {/* Informational Pages */}
         <Route path="about" element={<About />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="contact" element={<Contact />} />
         <Route path="contact-form" element={<Contact />} />
         
@@ -51,6 +54,17 @@ function AppRoutes() {
         <Route path="knowledge-hub" element={<KnowledgeHub />} />
         <Route path="library" element={<DigitalLibrary />} />
         <Route path="library/:id" element={<BookDetails />} />
+        <Route path="books" element={<DigitalLibrary />} />
+        <Route path="pdfs" element={<DigitalLibrary />} />
+        <Route path="notes" element={<DigitalLibrary />} />
+        <Route path="tags-and-filters" element={<DigitalLibrary />} />
+
+        {/* Activities & Events */}
+        <Route path="activities-and-events" element={<ActivityPage />} />
+        <Route path="conferences" element={<ActivityPage />} />
+        <Route path="workshops" element={<ActivityPage />} />
+        <Route path="reports" element={<ActivityPage />} />
+        <Route path="gallery" element={<ActivityPage />} />
 
         {/* Dynamic Archive Routing 
           This catches slugs like /literature, /scholarships, etc.
