@@ -66,10 +66,7 @@ function AppRoutes() {
         <Route path="reports" element={<ActivityPage />} />
         <Route path="gallery" element={<ActivityPage />} />
 
-        {/* Dynamic Archive Routing 
-          This catches slugs like /literature, /scholarships, etc.
-          It is placed last so fixed routes above take priority.
-        */}
+        
         <Route path=":collection" element={<CollectionPage />} />
       </Route>
 

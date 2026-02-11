@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
 :root {
   --color-primary: #1e293b;
   --color-bg: #f8f5ef;
@@ -10,6 +12,15 @@
   --font-heading: "Playfair Display", "Times New Roman", serif;
   --font-body: "Inter", "Source Sans Pro", "Segoe UI", sans-serif;
   --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --admin-ink: #0f172a;
+  --admin-bg: #f4f1ea;
+  --admin-surface: #ffffff;
+  --admin-border: #e6dfd4;
+  --admin-accent: #b45309;
+  --admin-accent-strong: #0f766e;
+  --admin-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+  --font-admin-heading: "Fraunces", "Times New Roman", serif;
+  --font-admin-body: "Space Grotesk", "Trebuchet MS", sans-serif;
 }
 
 .container-shell {
@@ -36,4 +47,151 @@
 
 .divider-line {
   border-top: 1px solid var(--color-border);
+}
+
+.admin-shell {
+  background: radial-gradient(circle at top left, rgba(180, 83, 9, 0.08), transparent 45%),
+    radial-gradient(circle at 20% 10%, rgba(15, 118, 110, 0.08), transparent 40%),
+    linear-gradient(180deg, #f7f3ed 0%, #f1ede6 100%);
+  color: var(--admin-ink);
+  font-family: var(--font-admin-body);
+}
+
+.admin-kicker {
+  color: var(--admin-accent);
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+}
+
+.admin-title {
+  font-family: var(--font-admin-heading);
+  letter-spacing: 0.4px;
+}
+
+.admin-panel {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-panel-subtle {
+  background: #fdfbf7;
+  border: 1px dashed var(--admin-border);
+  border-radius: 16px;
+}
+
+.admin-sidebar {
+  background: linear-gradient(180deg, #f8f4ed 0%, #efe9df 100%);
+  border-right: 1px solid var(--admin-border);
+}
+
+.admin-nav-link {
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.admin-nav-link:hover {
+  border-color: rgba(180, 83, 9, 0.3);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  transform: translateX(2px);
+}
+
+.admin-nav-active {
+  background: var(--admin-ink);
+  color: #ffffff;
+  border-color: var(--admin-ink);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+}
+
+.admin-chip {
+  align-items: center;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  color: var(--admin-ink);
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 600;
+  gap: 0.4rem;
+  padding: 0.2rem 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.admin-chip-strong {
+  border-color: rgba(15, 118, 110, 0.4);
+  color: var(--admin-accent-strong);
+}
+
+.admin-stat {
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  padding: 1rem;
+  background: #ffffff;
+}
+
+.admin-stat-value {
+  color: var(--admin-ink);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.admin-toggle {
+  appearance: none;
+  background: #e7e2d6;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 22px;
+  outline: none;
+  position: relative;
+  transition: background 0.2s ease;
+  width: 38px;
+}
+
+.admin-toggle::after {
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.2);
+  content: "";
+  height: 18px;
+  left: 2px;
+  position: absolute;
+  top: 2px;
+  transition: transform 0.2s ease;
+  width: 18px;
+}
+
+.admin-toggle:checked {
+  background: rgba(15, 118, 110, 0.5);
+}
+
+.admin-toggle:checked::after {
+  transform: translateX(16px);
+}
+
+.admin-input {
+  background: #ffffff;
+  border-color: var(--admin-border);
+  font-family: var(--font-admin-body);
+}
+
+.admin-select {
+  background: #ffffff;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  color: var(--admin-ink);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.admin-table thead {
+  color: #6b6459;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.admin-button {
+  box-shadow: 0 12px 20px rgba(15, 23, 42, 0.18);
 }

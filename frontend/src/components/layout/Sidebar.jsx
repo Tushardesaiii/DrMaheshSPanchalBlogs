@@ -11,10 +11,11 @@ const adminLinks = [
 
 function Sidebar() {
   return (
-    <aside className="h-full border-r border-(--color-border) bg-white px-6 py-8">
+    <aside className="admin-sidebar sticky top-0 h-screen px-6 py-8">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-(--color-accent)">Admin</p>
-        <h2 className="section-title text-lg text-(--color-primary)">Library Control</h2>
+        <p className="admin-kicker">Admin</p>
+        <h2 className="admin-title mt-3 text-lg">Library Control</h2>
+        <p className="mt-2 text-xs text-(--color-muted)">Precision control across content, catalog, and impact.</p>
       </div>
       <nav className="space-y-3 text-sm">
         {adminLinks.map((link) => {
@@ -25,7 +26,7 @@ function Sidebar() {
               to={link.to}
               end={link.to === '/admin'}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${isActive ? 'bg-(--color-primary) text-white' : 'text-(--color-muted) hover:text-(--color-primary)'}`
+                `admin-nav-link flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${isActive ? 'admin-nav-active' : 'text-(--color-muted) hover:text-(--color-primary)'}`
               }
             >
               <Icon size={18} />
@@ -34,6 +35,20 @@ function Sidebar() {
           )
         })}
       </nav>
+      <div className="mt-10 space-y-4 text-xs text-(--color-muted)">
+        <div className="admin-panel-subtle p-4">
+          <p className="admin-kicker">Control Layers</p>
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+            <span className="admin-chip">Visibility</span>
+            <span className="admin-chip">Moderation</span>
+            <span className="admin-chip">Policy</span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <span>Last audit</span>
+          <span className="text-(--color-primary)">3 days ago</span>
+        </div>
+      </div>
     </aside>
   )
 }
