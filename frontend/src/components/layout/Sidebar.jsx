@@ -35,20 +35,6 @@ function Sidebar() {
           )
         })}
       </nav>
-      <div className="mt-10 space-y-4 text-xs text-(--color-muted)">
-        <div className="admin-panel-subtle p-4">
-          <p className="admin-kicker">Control Layers</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-            <span className="admin-chip">Visibility</span>
-            <span className="admin-chip">Moderation</span>
-            <span className="admin-chip">Policy</span>
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Last audit</span>
-          <span className="text-(--color-primary)">3 days ago</span>
-        </div>
-      </div>
     </aside>
   )
 }

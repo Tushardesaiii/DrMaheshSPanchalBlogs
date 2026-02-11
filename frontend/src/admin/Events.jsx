@@ -1,18 +1,14 @@
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
+import Input from '../components/ui/Input'
 
 const eventRows = [
-  { title: 'Academic Research Colloquium', status: 'Scheduled', note: 'Keynote approved' },
-  { title: 'Digital Library Skills Workshop', status: 'Scheduled', note: 'Registration open' },
-  { title: 'Academic Writing Clinic', status: 'Planned', note: 'Awaiting venue' },
+  { title: 'Academic Research Colloquium', format: 'Event Notice', section: 'Events & Workshops', status: 'Scheduled' },
+  { title: 'Digital Library Skills Workshop', format: 'Event Notice', section: 'Events & Workshops', status: 'Published' },
+  { title: 'Academic Writing Clinic', format: 'Event Notice', section: 'Events & Workshops', status: 'Draft' },
 ]
 
-const eventControls = [
-  { label: 'Enable RSVP forms', helper: 'Collect attendee info', enabled: true },
-  { label: 'Public calendar visibility', helper: 'Show on homepage', enabled: true },
-  { label: 'Auto-reminder emails', helper: '48 hours before', enabled: false },
-  { label: 'Speaker approval gate', helper: 'Admin review', enabled: true },
-]
+const eventCategories = ['Conference', 'Workshop', 'Report', 'Gallery', 'Seminar']
 
 function Events() {
   return (
@@ -20,66 +16,83 @@ function Events() {
       <Card className="admin-panel">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="admin-kicker">Programming Controls</p>
-            <h3 className="admin-title mt-3 text-xl">Manage Events</h3>
-            <p className="mt-2 text-sm text-(--color-muted)">Control event visibility, approvals, and audience engagement.</p>
+            <p className="admin-kicker">Event Publisher</p>
+            <h3 className="admin-title mt-3 text-xl">Publish Event Notices</h3>
+            <p className="mt-2 text-sm text-(--color-muted)">Show events inside the homepage Events & Workshops section.</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button className="admin-button">Create Event</Button>
-            <Button variant="ghost" className="admin-button">Adjust Visibility</Button>
-          </div>
-        </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <div className="admin-panel-subtle p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-(--color-muted)">Scheduled</p>
-            <p className="mt-2 text-2xl font-semibold text-(--color-primary)">12</p>
-            <p className="mt-1 text-xs text-(--color-muted)">Next 30 days</p>
-          </div>
-          <div className="admin-panel-subtle p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-(--color-muted)">Pending</p>
-            <p className="mt-2 text-2xl font-semibold text-(--color-primary)">4</p>
-            <p className="mt-1 text-xs text-(--color-muted)">Awaiting approval</p>
-          </div>
-          <div className="admin-panel-subtle p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-(--color-muted)">Highlights</p>
-            <p className="mt-2 text-2xl font-semibold text-(--color-primary)">3</p>
-            <p className="mt-1 text-xs text-(--color-muted)">Featured on homepage</p>
-          </div>
+          <Button className="admin-button">Publish</Button>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {eventControls.map((control) => (
-            <div key={control.label} className="flex items-center justify-between gap-4 rounded-xl border border-(--color-border) bg-white p-4">
-              <div>
-                <p className="text-sm font-semibold text-(--color-primary)">{control.label}</p>
-                <p className="text-xs text-(--color-muted)">{control.helper}</p>
-              </div>
-              <input type="checkbox" className="admin-toggle" defaultChecked={control.enabled} />
+          <div>
+            <p className="admin-field-label">Event Title</p>
+            <Input className="admin-input mt-2" placeholder="Event title" />
+          </div>
+          <div>
+            <p className="admin-field-label">Date</p>
+            <Input className="admin-input mt-2" placeholder="Feb 20, 2026" />
+          </div>
+          <div>
+            <p className="admin-field-label">Format</p>
+            <select className="admin-select mt-2">
+              <option>Event Notice</option>
+              <option>Workshop Notice</option>
+              <option>Report</option>
+            </select>
+          </div>
+          <div>
+            <p className="admin-field-label">Categories</p>
+            <div className="admin-pill-group mt-3">
+              {eventCategories.map((category) => (
+                <label key={category} className="admin-pill">
+                  <input type="checkbox" name="categories" value={category} />
+                  <span>{category}</span>
+                </label>
+              ))}
             </div>
-          ))}
+          </div>
+          <div>
+            <p className="admin-field-label">Visibility</p>
+            <select className="admin-select mt-2">
+              <option>Public</option>
+              <option>Members</option>
+            </select>
+          </div>
         </div>
+        <label className="admin-dropzone mt-4">
+          <input type="file" className="hidden" multiple />
+          <p className="admin-field-label">Attachments</p>
+          <p className="text-sm text-(--color-muted)">Drop flyers, PDFs, or images.</p>
+          <p className="text-xs text-(--color-muted)">Gallery images supported.</p>
+        </label>
       </Card>
       <Card className="admin-panel">
         <div className="flex items-center justify-between">
-          <h3 className="admin-title text-lg">Event Calendar</h3>
-          <span className="admin-chip">Review queue</span>
+          <h3 className="admin-title text-lg">Event Queue</h3>
+          <span className="admin-chip">Events</span>
         </div>
-        <div className="mt-6 space-y-4 text-sm text-(--color-muted)">
-          {eventRows.map((event) => (
-            <div key={event.title} className="flex items-center justify-between border-b border-(--color-border) pb-3">
-              <div>
-                <p className="text-sm font-semibold text-(--color-primary)">{event.title}</p>
-                <p className="text-xs text-(--color-muted)">{event.note}</p>
-              </div>
-              <span className="admin-chip admin-chip-strong">{event.status}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-      <Card className="admin-panel">
-        <h3 className="admin-title text-lg">Event Media</h3>
-        <p className="mt-2 text-sm text-(--color-muted)">Upload UI placeholder for event gallery assets.</p>
-        <div className="admin-panel-subtle mt-4 flex items-center justify-center py-10 text-sm text-(--color-muted)">
-          Upload images, brochures, and reports
+        <div className="mt-6 overflow-x-auto">
+          <table className="admin-table w-full text-left text-sm">
+            <thead>
+              <tr>
+                <th className="pb-3">Title</th>
+                <th className="pb-3">Format</th>
+                <th className="pb-3">Section</th>
+                <th className="pb-3">Status</th>
+              </tr>
+            </thead>
+            <tbody className="text-(--color-text)">
+              {eventRows.map((event) => (
+                <tr key={event.title} className="border-t border-(--color-border)">
+                  <td className="py-3">{event.title}</td>
+                  <td className="py-3">{event.format}</td>
+                  <td className="py-3">{event.section}</td>
+                  <td className="py-3">
+                    <span className="admin-chip admin-chip-strong">{event.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Card>
     </div>
