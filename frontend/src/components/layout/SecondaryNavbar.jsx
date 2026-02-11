@@ -24,44 +24,44 @@ export default function Navbar() {
   const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[&]/g, 'and');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b-2 border-[#d9f99d] bg-[#0a0a0a] text-white antialiased">
-      <div className="mx-auto flex max-w-360 items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-50 w-full border-b-4 border-black bg-[#facc15] text-black antialiased">
+      <div className="mx-auto flex max-w-350 items-center justify-between px-6 py-3">
         
-        {/* Compact Logo */}
-        <NavLink to="/" className="group flex items-center gap-2">
-          <h1 className="text-2xl font-serif italic tracking-tighter leading-none">
-            Dr. Mahesh<span className="text-[#d9f99d]"> Solanki</span>
+        {/* Unified Brand Section */}
+        <NavLink to="/" className="group flex flex-col">
+          <h1 className="text-3xl font-serif italic tracking-tighter leading-none">
+            Dr. Mahesh <span className="bg-black text-[#facc15] px-1.5 not-italic">Solanki</span>
           </h1>
-               </NavLink>
+          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-black mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
+            Librarian : Gujarat Technological University
+          </h4>
+        </NavLink>
 
-        {/* Minimalist Sticky Nav */}
-        <nav className="hidden md:flex items-center gap-2">
+        {/* High-Contrast Sticky Nav */}
+        <nav className="hidden md:flex items-center">
           {NAV_GROUPS.map((group) => (
             <div key={group.title} className="group relative">
-              <button className="flex items-center gap-1.5 px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 transition-colors hover:text-[#d9f99d]">
+              <button className="flex items-center gap-1.5 px-5 py-6 text-[11px] font-black uppercase tracking-[0.2em] transition-colors hover:bg-black hover:text-[#facc15]">
                 {group.title}
-                <ChevronDown size={12} className="transition-transform group-hover:rotate-180 text-zinc-600 group-hover:text-[#d9f99d]" />
+                <ChevronDown size={14} strokeWidth={4} className="transition-transform group-hover:rotate-180" />
               </button>
 
-              {/* High-Visibility Hover List */}
-              <div className="invisible absolute left-0 top-full w-50 pt-2 opacity-0 group-hover:visible group-hover:opacity-100  transition-all duration-200">
-                <ul className="border-2 border-[#d9f99d] bg-[#0a0a0a] p-2 shadow-[10px_10px_0px_0px_rgba(217,249,157,0.1)] rounded">
+              {/* The "Boxy" Dropdown */}
+              <div className="invisible absolute left-0 top-full w-64 pt-0 opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200">
+                <ul className="border-4 border-black bg-white shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
                   {group.links.map((link) => (
-                    <li key={link}>
+                    <li key={link} className="border-b-2 border-black last:border-0">
                       <NavLink 
                         to={`/${slugify(link)}`}
                         className={({ isActive }) => `
-                          group/item flex items-center justify-between py-2 text-sm font-bold transition-all
+                          group/item flex items-center justify-between p-4 text-xs font-black uppercase tracking-widest transition-all
                           ${isActive 
-                            ? 'text-[#d9f99d] translate-x-2' 
-                            : 'text-zinc-100 hover:text-[#d9f99d] hover:translate-x-2'}
+                            ? 'bg-[#facc15] text-[#facc15]' 
+                            : 'text-black hover:bg-[#facc15]'}
                         `}
                       >
-                        <span className="flex items-center gap-2">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#d9f99d] opacity-0 group-hover/item:opacity-100 transition-opacity" />
-                          {link}
-                        </span>
-                        <ArrowRight size={14} className="opacity-0 -translate-x-2 transition-all group-hover/item:opacity-100 group-hover/item:translate-x-0" />
+                        {link}
+                        <ArrowRight size={18} strokeWidth={3} className="opacity-0 -translate-x-3 transition-all group-hover/item:opacity-100 group-hover/item:translate-x-0" />
                       </NavLink>
                     </li>
                   ))}
@@ -73,11 +73,12 @@ export default function Navbar() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-6">
-          <NavLink to="/all-blogs" className="hidden lg:block text-[10px] font-black uppercase tracking-[0.3em] text-[#d9f99d] hover:brightness-125">
+          <NavLink to="/all-blogs" className="hidden lg:block text-xs font-black uppercase tracking-[0.2em] border-b-4 border-black pb-0.5  hover:text-[#facc15] transition-all">
             Full Index
           </NavLink>
-          <button className="flex h-10 w-10 items-center justify-center border-2 border-white text-white transition-all hover:bg-[#d9f99d] hover:border-[#d9f99d] hover:text-black">
-            <Search size={18} strokeWidth={3} />
+          
+          <button className="group flex h-12 w-12 items-center justify-center border-4 border-black bg-black text-[#facc15] transition-all hover:bg-[#facc15] hover:text-black">
+            <Search size={22} strokeWidth={4} />
           </button>
         </div>
       </div>
