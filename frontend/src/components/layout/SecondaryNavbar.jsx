@@ -44,8 +44,8 @@ export default function Navbar() {
               </button>
 
               {/* High-Visibility Hover List */}
-              <div className="invisible absolute left-0 top-full w-64 pt-2 opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200">
-                <ul className="border-2 border-[#d9f99d] bg-[#0a0a0a] p-4 shadow-[10px_10px_0px_0px_rgba(217,249,157,0.1)]">
+              <div className="invisible absolute left-0 top-full w-50 pt-2 opacity-0 group-hover:visible group-hover:opacity-100  transition-all duration-200">
+                <ul className="border-2 border-[#d9f99d] bg-[#0a0a0a] p-2 shadow-[10px_10px_0px_0px_rgba(217,249,157,0.1)] rounded">
                   {group.links.map((link) => (
                     <li key={link}>
                       <NavLink 

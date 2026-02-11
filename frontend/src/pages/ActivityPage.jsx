@@ -93,7 +93,7 @@ function ActivityPage() {
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid grid-cols-1 gap-12">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="group relative grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 items-center bg-white rounded-[3rem] p-4 border border-slate-100 transition-all hover:shadow-2xl hover:border-blue-100">
+            <div key={item} className="group relative grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 items-center bg-white rounded-[3rem] p-4 border border-slate-100 transition-all hover:shadow-md hover:border-blue-100">
               
               {/* Image/Visual Part */}
               <div className="aspect-video md:aspect-square rounded-[2.5rem] bg-slate-100 overflow-hidden relative">
