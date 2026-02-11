@@ -4,7 +4,7 @@ import { Search, Plus, ArrowRight } from 'lucide-react';
 const NAV_GROUPS = [
   {
     title: "Knowledge Hub",
-    links: ["Literature", "Competitive Exams", "Learning Resources", "Research Papers", "Library Reports", "Gujarati Content", "Scholarships", "Events & Workshops"]
+    links: ["Research Papers", "Library Reports", "Gujarati Content", "Events & Workshops"]
   },
   {
     title: "Activities & Events",
@@ -24,55 +24,65 @@ export default function Navbar() {
   const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[&]/g, 'and');
 
   return (
-    <header className="w-full bg-[#0a0a0a] text-white antialiased">
+    <header className="w-full h-fit  bg-[#facc15] text-black antialiased">
       {/* Brand Section */}
-      <div className="mx-auto flex max-w-400 items-center justify-between px-10 py-14">
-        <NavLink to="/" className="group">
-          <h1 className="text-6xl font-serif italic tracking-tighter leading-none">
-            Dr. Mahesh<span className="text-[#d9f99d]"> Solanki</span>
-          </h1>
-          <div className="h-1.5 w-24 bg-[#d9f99d] mt-2 group-hover:w-full transition-all duration-500"></div>
-        </NavLink>
+      <div className="mx-auto flex max-w-350 items-center justify-between px-10  py-6 border-b-4 border-black">
+       <NavLink to="/" className="group inline-block">
+  <div className="flex flex-col gap-2">
+    <h1 className="text-7xl  font-serif italic tracking-tighter leading-none">
+      Dr. Mahesh<span className="bg-black text-[#facc15] px-3 ml-2 not-italic">Solanki</span>
+    </h1>
+    
+    <div className="flex items-center gap-4">
+      <span className="h-0.5 w-12 bg-black transition-all group-hover:w-20" />
+      <h4 className="text-xs font-black uppercase tracking-[0.3em] text-black/80">
+        Librarian <span className="mx-2 opacity-30">|</span> Gujarat Technological University
+      </h4>
+    </div>
+  </div>
+  
+  {/* Animated Underline */}
 
-        <div className="flex items-center gap-12">
-          <NavLink to="/all-blogs" className="text-sm font-black uppercase tracking-[0.3em] text-[#d9f99d] hover:brightness-125">
+</NavLink>
+
+        <div className="flex items-center gap-10">
+          <NavLink to="/all-blogs" className="text-sm font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:border-b-2 hover:border-[#facc15] hover:text-[#facc15] transition-colors">
             View All Blogs
           </NavLink>
-          <button className="group flex items-center gap-4 border-2 border-white px-8 py-4 transition-all hover:bg-white hover:text-black">
-            <Search size={20} strokeWidth={3} />
+          <button className="group flex items-center gap-4 bg-black text-[#facc15] px-8 py-4 transition-all hover:ring-4 hover:ring-black hover:bg-transparent hover:text-black">
+            <Search size={22} strokeWidth={3} />
             <span className="text-sm font-black uppercase tracking-widest">Search</span>
           </button>
         </div>
       </div>
 
       {/* High-Visibility Navigation Grid */}
-      <nav className="border-y-2 border-zinc-800">
-        <div className="mx-auto max-w-400">
-          <div className="grid grid-cols-1 md:grid-cols-4 divide-y-2 md:divide-y-0 md:divide-x-2 divide-zinc-800">
+      <nav className="bg-white">
+        <div className="mx-auto max-w-350">
+          <div className="grid grid-cols-1 md:grid-cols-4 divide-y-4 md:divide-y-0 md:divide-x-4 divide-black border-x-4 border-black border-b-4">
             {NAV_GROUPS.map((group) => (
-              <div key={group.title} className="p-10 transition-colors hover:bg-[#111]">
-                <h3 className="mb-10 flex items-center gap-3 text-xs font-black uppercase tracking-[0.4em] text-zinc-500">
-                  <Plus size={14} className="text-[#d9f99d]" />
+              <div key={group.title} className="p-10 transition-colors hover:bg-[#fef9c3]">
+                <h3 className="mb-8 flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] bg-black text-white p-2 w-fit">
+                  <Plus size={14} strokeWidth={4} />
                   {group.title}
                 </h3>
                 
-                <ul className="space-y-5">
+                <ul className="space-y-4">
                   {group.links.map((link) => (
                     <li key={link}>
                       <NavLink 
                         to={`/${slugify(link)}`}
                         className={({ isActive }) => `
-                          group flex items-center justify-between text-lg font-bold transition-all
+                          group flex items-center justify-between text-lg font-extrabold transition-all
                           ${isActive 
-                            ? 'text-[#d9f99d] translate-x-2' 
-                            : 'text-zinc-100 hover:text-[#d9f99d] hover:translate-x-2'}
+                            ? 'bg-black text-[#facc15] px-3 py-1 -translate-x-2' 
+                            : 'text-black hover:bg-[#facc15] hover:px-3 hover:py-1'}
                         `}
                       >
-                        <span className="flex items-center gap-3">
-                          <span className="h-2 w-2 rounded-full bg-[#d9f99d] scale-0 group-hover:scale-100 transition-transform" />
+                        <span className="flex items-center gap-2">
                           {link}
                         </span>
-                        <ArrowRight size={18} className="opacity-0 -translate-x-4 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                        <ArrowRight size={20} strokeWidth={3} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </NavLink>
                     </li>
                   ))}
