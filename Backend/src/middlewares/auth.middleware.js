@@ -1,10 +1,10 @@
 // src/middlewares/auth.middleware.js
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 
-export const verifyJWT = asyncHandler(async (req, _, next) => {
+export const verifyJWT = asyncHandler(async (req, _res, next) => {
   try {
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
@@ -25,4 +25,12 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid access token");
   }
+});
+
+export const verifyAdmin = asyncHandler(async (req, _res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    throw new ApiError(403, "Admin access required");
+  }
+
+  next();
 });

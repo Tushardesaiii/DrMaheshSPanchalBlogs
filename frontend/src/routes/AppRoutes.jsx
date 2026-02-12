@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 // Layouts
 import MainLayout from '../components/layout/MainLayout'
 import AdminLayout from '../admin/AdminLayout'
+import Login from '../admin/Login'
+import ProtectedRoute from './ProtectedRoute'
 
 // Public Pages
 import Home from '../pages/Home'
@@ -70,13 +72,17 @@ function AppRoutes() {
         <Route path=":collection" element={<CollectionPage />} />
       </Route>
 
+      <Route path="/login" element={<Login />} />
+
       {/* Admin Panel Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="books" element={<AdminBooks />} />
-        <Route path="articles" element={<AdminArticles />} />
-        <Route path="events" element={<AdminEvents />} />
-        <Route path="categories" element={<AdminCategories />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="books" element={<AdminBooks />} />
+          <Route path="articles" element={<AdminArticles />} />
+          <Route path="events" element={<AdminEvents />} />
+          <Route path="categories" element={<AdminCategories />} />
+        </Route>
       </Route>
 
       {/* 404 - Fallback for undefined routes */}
