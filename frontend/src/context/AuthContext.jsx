@@ -6,23 +6,34 @@ const getApiBase = () => import.meta.env.VITE_API_BASE_URL || ''
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [token, setToken] = useState(localStorage.getItem('accessToken'))
   const [loading, setLoading] = useState(true)
   const apiBase = getApiBase()
 
   const request = async (path, options = {}) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(options.headers || {}),
+    }
+
     const response = await fetch(`${apiBase}${path}`, {
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      },
+      headers,
       ...options,
     })
 
-    const payload = await response.json().catch(() => ({}))
+    let payload = {}
+    try {
+      payload = await response.json()
+    } catch (e) {
+      console.error('Failed to parse response:', e)
+    }
 
     if (!response.ok) {
-      const message = payload?.message || 'Request failed'
+      const message = typeof payload?.message === 'string'
+        ? payload.message
+        : `HTTP ${response.status}: Request failed`
       throw new Error(message)
     }
 
@@ -34,16 +45,23 @@ export function AuthProvider({ children }) {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     })
+    const accessToken = data?.data?.accessToken
+    if (accessToken) {
+      setToken(accessToken)
+      localStorage.setItem('accessToken', accessToken)
+    }
     setUser(data?.data?.user || null)
     return data
   }
 
   const logout = async () => {
     setUser(null)
+    setToken(null)
+    localStorage.removeItem('accessToken')
     try {
       await request('/api/auth/logout', { method: 'POST' })
     } catch (error) {
-      // Ignore logout errors so UI updates immediately.
+      // Ignore logout errors
     }
   }
 
@@ -53,6 +71,8 @@ export function AuthProvider({ children }) {
       setUser(data?.data?.user || null)
     } catch (error) {
       setUser(null)
+      setToken(null)
+      localStorage.removeItem('accessToken')
     } finally {
       setLoading(false)
     }
@@ -62,7 +82,7 @@ export function AuthProvider({ children }) {
     refresh()
   }, [])
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading])
+  const value = useMemo(() => ({ user, token, loading, login, logout }), [user, token, loading])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

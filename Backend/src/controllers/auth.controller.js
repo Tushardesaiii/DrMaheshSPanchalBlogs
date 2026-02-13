@@ -9,8 +9,8 @@ const COOKIE_MAX_AGE_DAYS = Number(process.env.ACCESS_TOKEN_MAX_AGE_DAYS || 7);
 
 const buildCookieOptions = () => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: false,
+  sameSite: 'lax',
   maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
 });
 
@@ -34,7 +34,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
   }
 
   const token = jwt.sign(
-    { userId: user._id, role: user.role },
+    { _id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: TOKEN_EXPIRES_IN }
   );
@@ -49,6 +49,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
       },
+      accessToken: token,
     }, "Login successful")
   );
 });

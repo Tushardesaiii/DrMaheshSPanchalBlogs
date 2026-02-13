@@ -1,7 +1,10 @@
 import ArticleCard from '../components/cards/ArticleCard'
-import articles from '../data/articles'
+import { useContent } from '../context/ContentContext'
 
 function AllBlogs() {
+  const { loading, getNormalizedByFormat } = useContent()
+  const articles = getNormalizedByFormat('Article')
+
   return (
     <div className="space-y-8">
       <header>
@@ -10,9 +13,15 @@ function AllBlogs() {
         <p className="mt-2 text-sm text-(--color-muted)">A complete index of published academic writing and knowledge briefs.</p>
       </header>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
+        {loading ? (
+          <p className="col-span-3 text-(--color-muted)">Loading articles...</p>
+        ) : articles.length > 0 ? (
+          articles.map((article) => (
+            <ArticleCard key={article.id} article={article} />
+          ))
+        ) : (
+          <p className="col-span-3 text-(--color-muted)">No articles found.</p>
+        )}
       </div>
     </div>
   )

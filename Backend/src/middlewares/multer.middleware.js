@@ -23,9 +23,18 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter to accept only video and image files (video for "video" field, images for "thumbnail")
+// File filter to accept various file types for content uploads
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === "video") {
+  if (file.fieldname === "files") {
+    // Accept common document, image, and video formats
+    const allowedTypes = /pdf|docx?|xlsx?|pptx?|txt|jpg|jpeg|png|gif|mp4|mov|avi|mkv|webm/;
+    const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
+    if (allowedTypes.test(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Unsupported file format: ${ext}`));
+    }
+  } else if (file.fieldname === "video") {
     // Accept common video formats
     const allowedVideoTypes = /mp4|mov|avi|mkv|webm/;
     const ext = path.extname(file.originalname).toLowerCase();

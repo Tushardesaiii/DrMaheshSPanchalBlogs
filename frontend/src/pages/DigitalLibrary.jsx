@@ -3,14 +3,16 @@ import Input from '../components/ui/Input'
 import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
 import BookCard from '../components/cards/BookCard'
-import books from '../data/books'
 import { COLLECTIONS_DATA } from '../data/collections'
+import { useContent } from '../context/ContentContext'
 
 function DigitalLibrary() {
   const { collection } = useParams()
   const location = useLocation()
   const slug = collection ?? location.pathname.split('/').filter(Boolean).pop()
   const data = COLLECTIONS_DATA[slug]
+  const { loading, getNormalizedByFormats } = useContent()
+  const libraryItems = getNormalizedByFormats(['PDF', 'Guide', 'Report', 'Collection'])
 
   if (!data || data.type !== 'library') {
     return <div className="py-20 text-center font-serif italic">Library collection not found.</div>
@@ -32,9 +34,15 @@ function DigitalLibrary() {
       </div>
       {slug === 'library' || slug === 'books' ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
+          {loading ? (
+            <p className="col-span-3 text-(--color-muted)">Loading library items...</p>
+          ) : libraryItems.length > 0 ? (
+            libraryItems.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))
+          ) : (
+            <p className="col-span-3 text-(--color-muted)">No library items found.</p>
+          )}
         </div>
       ) : (
         <Card>

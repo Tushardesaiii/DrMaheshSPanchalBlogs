@@ -1,19 +1,28 @@
 import ArticleCard from '../components/cards/ArticleCard'
 import Badge from '../components/ui/Badge'
-import articles from '../data/articles'
+import { useContent } from '../context/ContentContext'
 
 const tags = ['UX', 'Metadata', 'Pedagogy', 'Research', 'Library']
 
 function Articles() {
+  const { loading, getNormalizedByFormat } = useContent()
+  const articles = getNormalizedByFormat('Article')
+
   return (
     <div className="grid gap-10 lg:grid-cols-[1.8fr_0.8fr]">
       <div>
         <h2 className="section-title text-3xl text-(--color-primary)">Articles & Editorial</h2>
         <p className="mt-2 text-sm text-(--color-muted)">Long-form academic insights with a reading-first layout.</p>
         <div className="mt-6 grid gap-6 md:grid-cols-2">
-          {articles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
+          {loading ? (
+            <p className="col-span-2 text-(--color-muted)">Loading articles...</p>
+          ) : articles.length > 0 ? (
+            articles.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))
+          ) : (
+            <p className="col-span-2 text-(--color-muted)">No articles found.</p>
+          )}
         </div>
       </div>
       <aside className="space-y-6">

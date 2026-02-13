@@ -1,8 +1,12 @@
 import { useParams, Link } from 'react-router-dom'
-import { ChevronLeft, Filter, BookOpen, Download, LayoutGrid, Info, ArrowUpRight, GraduationCap, FileText, BarChart3, Languages, Award, Calendar } from 'lucide-react'
+import { ChevronLeft, Filter, BookOpen, LayoutGrid, Info, GraduationCap, FileText, BarChart3, Languages, Award, Calendar } from 'lucide-react'
 
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
+import ArticleCard from '../components/cards/ArticleCard'
+import BookCard from '../components/cards/BookCard'
+import EventCard from '../components/cards/EventCard'
+import { useContent } from '../context/ContentContext'
 
 const COLLECTIONS = {
   'literature': {
@@ -66,6 +70,7 @@ const COLLECTIONS = {
 function CollectionPage() {
   const { collection } = useParams()
   const data = COLLECTIONS[collection]
+  const { loading, getNormalizedBySection } = useContent()
 
   // Dynamic Theme Mapping
   const theme = {
@@ -90,6 +95,18 @@ function CollectionPage() {
   }
 
   const Icon = data.icon
+  const sectionName = data?.title
+  const sectionItems = sectionName ? getNormalizedBySection(sectionName) : []
+
+  const renderCard = (item) => {
+    if (item.format === 'Event Notice') {
+      return <EventCard key={item.id} event={item} />
+    }
+    if (['PDF', 'Report', 'Guide', 'Collection'].includes(item.format)) {
+      return <BookCard key={item.id} book={item} />
+    }
+    return <ArticleCard key={item.id} article={item} />
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-6 space-y-12 py-10">
@@ -142,7 +159,7 @@ function CollectionPage() {
         </div>
       </header>
 
-      {/* 3. Content Stacks (Placeholder for Backend Data) */}
+      {/* 3. Content Stacks */}
       <section className="space-y-8">
         <div className="flex items-center justify-between">
            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Archived Documents</h3>
@@ -153,27 +170,13 @@ function CollectionPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="group cursor-pointer">
-              <div className="aspect-4/5 rounded-2xl bg-slate-50 border border-slate-200 p-8 flex flex-col justify-between transition-all group-hover:shadow-2xl group-hover:border-slate-300 group-hover:-translate-y-1">
-                <div className="flex justify-between items-start">
-                   <div className="h-10 w-10 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-600 transition-colors">
-                      <FileText size={20} />
-                   </div>
-                   <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Doc-00{i}</span>
-                </div>
-                <div className="space-y-3">
-                   <div className="h-2 w-24 bg-slate-200 rounded-full group-hover:bg-blue-200 transition-colors" />
-                   <div className="h-4 w-full bg-slate-200 rounded-lg" />
-                   <div className="h-4 w-2/3 bg-slate-200 rounded-lg" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center justify-between px-2">
-                 <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Connecting Archive...</p>
-                 <ArrowUpRight size={14} className="text-slate-300 group-hover:text-blue-600 transition-colors" />
-              </div>
-            </div>
-          ))}
+          {loading ? (
+            <p className="col-span-3 text-sm text-slate-500">Loading archive...</p>
+          ) : sectionItems.length > 0 ? (
+            sectionItems.map((item) => renderCard(item))
+          ) : (
+            <p className="col-span-3 text-sm text-slate-500">No content found for this section.</p>
+          )}
         </div>
       </section>
     </div>
