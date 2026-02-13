@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Card from '../ui/Card'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
@@ -8,10 +9,11 @@ function ArticleCard({ article }) {
   const author = article?.author || 'Admin'
 
   return (
-    <Card className="flex h-full flex-col">
-      <div className="flex-1">
-        <Badge>{category}</Badge>
-        <h3 className="section-title mt-3 text-lg text-(--color-primary)">{article?.title}</h3>
+    <Link to={`/content/${article?.id}`} className="block h-full">
+      <Card className="flex h-full flex-col transition-all hover:shadow-lg hover:-translate-y-1">
+        <div className="flex-1">
+          <Badge>{category}</Badge>
+          <h3 className="section-title mt-3 text-lg text-(--color-primary)">{article?.title}</h3>
         <p className="mt-2 text-sm text-(--color-muted)">{article?.description}</p>
         <p className="mt-3 text-xs text-(--color-muted)">By {author}</p>
         {tags.length > 0 && (
@@ -21,11 +23,12 @@ function ArticleCard({ article }) {
             ))}
           </div>
         )}
-      </div>
-      <div className="mt-6">
-        <Button variant="ghost">Read Article</Button>
-      </div>
-    </Card>
+        </div>
+        <div className="mt-6">
+          <Button variant="ghost">Read Article</Button>
+        </div>
+      </Card>
+    </Link>
   )
 }
 

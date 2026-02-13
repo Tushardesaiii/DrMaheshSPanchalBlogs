@@ -15,6 +15,7 @@ import DigitalLibrary from '../pages/DigitalLibrary'
 import Articles from '../pages/Articles'
 import ArticleDetails from '../pages/ArticleDetails'
 import BookDetails from '../pages/BookDetails'
+import ContentDetails from '../pages/ContentDetails'
 import Events from '../pages/Events'
 import Contact from '../pages/Contact'
 import AllBlogs from '../pages/AllBlogs'
@@ -50,6 +51,7 @@ function AppRoutes() {
         <Route path="all-blogs" element={<AllBlogs />} />
         <Route path="articles" element={<Articles />} />
         <Route path="articles/:id" element={<ArticleDetails />} />
+        <Route path="content/:id" element={<ContentDetails />} />
         <Route path="events" element={<Events />} />
 
         {/* Library & Research Hubs */}
