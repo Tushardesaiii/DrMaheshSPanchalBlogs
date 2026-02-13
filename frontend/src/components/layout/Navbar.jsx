@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
-import { Search, Plus, ArrowRight } from 'lucide-react';
+import { NavLink } from "react-router-dom";
+import { Search, Plus, ArrowRight } from "lucide-react";
 
 const NAV_GROUPS = [
   {
@@ -21,93 +21,92 @@ const NAV_GROUPS = [
 ];
 
 export default function Navbar() {
-  const slugify = (text) => text.toLowerCase().replace(/\s+/g, '-').replace(/[&]/g, 'and');
+  const slugify = (text) =>
+    text.toLowerCase().replace(/\s+/g, "-").replace(/[&]/g, "and");
 
   return (
-    <header className="w-full bg-gradient-to-b from-[#0F172A] to-[#111827] text-[#F5EFE6] antialiased">
-
-  {/* Brand Section */}
-  <div className="mx-auto flex max-w-[1400px] items-center justify-between px-12 py-10 border-b border-[#C2A878]/30">
-    
-    <NavLink to="/" className="group inline-block">
-      <div className="flex flex-col gap-4">
+    <header className="w-full bg-[#1F3A33] text-[#F3EBDD]">
+      
+      {/* Brand Section */}
+      <div className="mx-auto flex max-w-350 items-center justify-between px-12 py-10 border-b border-[#B89B5E]/30">
         
-        <h1 className="text-7xl font-serif italic tracking-tight leading-none">
-          Dr. Mahesh
-          <span className="ml-3 not-italic font-bold text-[#C2A878]">
-            Solanki
-          </span>
-        </h1>
+        <NavLink to="/" className="group">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-7xl font-serif italic leading-none tracking-tight">
+              Dr. Mahesh
+              <span className="ml-3 not-italic font-bold text-[#B89B5E]">
+                Solanki
+              </span>
+            </h1>
 
-        <div className="flex items-center gap-4">
-          <span className="h-[1px] w-16 bg-[#C2A878]/60 transition-all group-hover:w-28" />
-          <h4 className="text-xs font-semibold uppercase tracking-[0.35em] text-[#F5EFE6]/70">
-            Librarian <span className="mx-2 opacity-40">|</span> Gujarat Technological University
-          </h4>
-        </div>
+            <div className="flex items-center gap-4">
+              <span className="h-px w-16 bg-[#B89B5E]/60 group-hover:w-28 transition-all" />
+              <h4 className="text-xs uppercase tracking-[0.35em] text-[#F3EBDD]/70">
+                Librarian <span className="mx-2 opacity-40">|</span> Gujarat Technological University
+              </h4>
+            </div>
+          </div>
+        </NavLink>
 
-      </div>
-    </NavLink>
-
-    <div className="flex items-center gap-10">
-      <NavLink
-        to="/all-blogs"
-        className="text-sm font-semibold uppercase tracking-[0.25em] border-b border-transparent hover:border-[#C2A878] transition-colors"
-      >
-        View All Blogs
-      </NavLink>
-
-      <button className="group flex items-center gap-4 bg-[#C2A878] text-[#0F172A] px-7 py-3 font-semibold uppercase tracking-widest hover:brightness-110 transition-all">
-        <Search size={20} strokeWidth={2} />
-        Search
-      </button>
-    </div>
-  </div>
-
-  {/* Navigation Grid */}
-  <nav className="bg-[#F5EFE6] text-[#0F172A]">
-    <div className="mx-auto max-w-[1400px]">
-      <div className="grid grid-cols-1 md:grid-cols-4 divide-x divide-[#0F172A]/10">
-        
-        {NAV_GROUPS.map((group) => (
-          <div
-            key={group.title}
-            className="p-12 hover:bg-[#E9DFC8] transition-colors"
+        <div className="flex items-center gap-10">
+          <NavLink
+            to="/all-blogs"
+            className="text-sm uppercase tracking-[0.25em] border-b border-transparent hover:border-[#B89B5E] transition"
           >
-            <h3 className="mb-8 text-xs font-bold uppercase tracking-[0.35em] text-[#0F172A]/70">
-              {group.title}
-            </h3>
+            View All Blogs
+          </NavLink>
 
-            <ul className="space-y-5">
-              {group.links.map((link) => (
-                <li key={link}>
-                  <NavLink
-                    to={`/${slugify(link)}`}
-                    className={({ isActive }) => `
-                      group flex items-center justify-between text-lg font-semibold transition-all
-                      ${isActive
-                        ? 'text-[#C2A878]'
-                        : 'hover:translate-x-2'}
-                    `}
-                  >
-                    {link}
-                    <ArrowRight
-                      size={18}
-                      strokeWidth={2}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
+          <button className="flex items-center gap-4 bg-[#B89B5E] text-[#1F3A33] px-6 py-3 font-semibold uppercase tracking-widest hover:brightness-110 transition">
+            <Search size={20} strokeWidth={2} />
+            Search
+          </button>
+        </div>
+      </div>
+
+      {/* Navigation Grid */}
+      <nav className="bg-[#F3EBDD] text-[#1F3A33]">
+        <div className="mx-auto max-w-350">
+          <div className="grid grid-cols-1 md:grid-cols-4 divide-x divide-[#1F3A33]/10">
+
+            {NAV_GROUPS.map((group) => (
+              <div
+                key={group.title}
+                className="p-12 hover:bg-[#E6DCCB] transition-colors"
+              >
+                <h3 className="mb-8 text-xs font-bold uppercase tracking-[0.35em] text-[#1F3A33]/70 flex items-center gap-2">
+                  <Plus size={14} strokeWidth={3} />
+                  {group.title}
+                </h3>
+
+                <ul className="space-y-5">
+                  {group.links.map((link) => (
+                    <li key={link}>
+                      <NavLink
+                        to={`/${slugify(link)}`}
+                        className={({ isActive }) =>
+                          `group flex items-center justify-between text-lg font-semibold transition-all ${
+                            isActive
+                              ? "text-[#B89B5E]"
+                              : "hover:translate-x-2"
+                          }`
+                        }
+                      >
+                        {link}
+                        <ArrowRight
+                          size={18}
+                          strokeWidth={2}
+                          className="opacity-0 group-hover:opacity-100 transition"
+                        />
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
           </div>
-        ))}
-
-      </div>
-    </div>
-  </nav>
-</header>
-
+        </div>
+      </nav>
+    </header>
   );
 }
