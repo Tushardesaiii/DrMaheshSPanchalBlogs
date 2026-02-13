@@ -2,8 +2,10 @@ import ArticleCard from '../components/cards/ArticleCard'
 import { useContent } from '../context/ContentContext'
 
 function AllBlogs() {
-  const { loading, getNormalizedByFormat } = useContent()
-  const articles = getNormalizedByFormat('Article')
+  const { loading, getNormalizedBySection, getNormalizedByFormat } = useContent()
+  const sectionArticles = getNormalizedBySection('Articles')
+  const formatArticles = getNormalizedByFormat('Article')
+  const articles = sectionArticles.length > 0 ? sectionArticles : formatArticles
 
   return (
     <div className="space-y-8">

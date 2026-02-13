@@ -11,8 +11,8 @@ function DigitalLibrary() {
   const location = useLocation()
   const slug = collection ?? location.pathname.split('/').filter(Boolean).pop()
   const data = COLLECTIONS_DATA[slug]
-  const { loading, getNormalizedByFormats, getNormalizedBySection } = useContent()
-  const libraryItems = getNormalizedByFormats(['PDF', 'Guide', 'Report', 'Collection'])
+  const { loading, getNormalizedByFormats, getNormalizedBySection, getNormalizedBySections } = useContent()
+  const libraryItems = getNormalizedBySections(['Books', 'PDFs', 'Notes', 'Articles', 'Library Reports'])
   const sectionFilters = {
     books: 'Books',
     pdfs: 'PDFs',

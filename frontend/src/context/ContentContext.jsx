@@ -157,6 +157,11 @@ export function ContentProvider({ children }) {
     return normalizedContents.filter((c) => formatSet.has(c.format))
   }, [normalizedContents])
 
+  const getNormalizedBySections = useCallback((sectionNames) => {
+    const sectionSet = new Set(sectionNames)
+    return normalizedContents.filter((c) => c.sections.some((section) => sectionSet.has(section)))
+  }, [normalizedContents])
+
   useEffect(() => {
     fetchContents()
   }, [fetchContents])
@@ -172,8 +177,9 @@ export function ContentProvider({ children }) {
     getNormalizedBySection,
     getNormalizedByFormat,
     getNormalizedByFormats,
+    getNormalizedBySections,
     fetchContents,
-  }), [contents, normalizedContents, loading, addContent, updateContent, deleteContent, getContentBySection, getNormalizedBySection, getNormalizedByFormat, getNormalizedByFormats, fetchContents])
+  }), [contents, normalizedContents, loading, addContent, updateContent, deleteContent, getContentBySection, getNormalizedBySection, getNormalizedByFormat, getNormalizedByFormats, getNormalizedBySections, fetchContents])
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
 }

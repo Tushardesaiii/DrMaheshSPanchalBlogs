@@ -99,10 +99,13 @@ function CollectionPage() {
   const sectionItems = sectionName ? getNormalizedBySection(sectionName) : []
 
   const renderCard = (item) => {
-    if (item.format === 'Event Notice') {
+    const eventSections = new Set(['Events & Workshops', 'Conferences', 'Workshops', 'Reports', 'Gallery'])
+    const librarySections = new Set(['Books', 'PDFs', 'Notes', 'Library Reports'])
+
+    if (sectionName && eventSections.has(sectionName)) {
       return <EventCard key={item.id} event={item} />
     }
-    if (['PDF', 'Report', 'Guide', 'Collection'].includes(item.format)) {
+    if (sectionName && librarySections.has(sectionName)) {
       return <BookCard key={item.id} book={item} />
     }
     return <ArticleCard key={item.id} article={item} />

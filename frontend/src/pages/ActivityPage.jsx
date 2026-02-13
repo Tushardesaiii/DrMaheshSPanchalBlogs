@@ -63,15 +63,7 @@ function ActivityPage() {
   const sectionName = data?.title
   const sectionItems = sectionName ? getNormalizedBySection(sectionName) : []
 
-  const renderCard = (item) => {
-    if (item.format === 'Event Notice') {
-      return <EventCard key={item.id} event={item} />
-    }
-    if (['PDF', 'Report', 'Guide', 'Collection'].includes(item.format)) {
-      return <BookCard key={item.id} book={item} />
-    }
-    return <ArticleCard key={item.id} article={item} />
-  }
+  const renderCard = (item) => <EventCard key={item.id} event={item} />
 
   return (
     <div className="min-h-screen bg-[#fafafa]">

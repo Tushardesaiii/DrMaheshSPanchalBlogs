@@ -20,12 +20,36 @@ const SECTIONS = [
 
 const FORMATS = ['Article', 'PDF', 'Report', 'Guide', 'Collection', 'Event Notice']
 
+const getFormatFromSections = (sections) => {
+  if (!Array.isArray(sections) || sections.length === 0) return 'Article'
+
+  const sectionSet = new Set(sections)
+  if (sectionSet.has('Conferences') || sectionSet.has('Workshops') || sectionSet.has('Events & Workshops') || sectionSet.has('Gallery')) {
+    return 'Event Notice'
+  }
+  if (sectionSet.has('Reports') || sectionSet.has('Library Reports')) {
+    return 'Report'
+  }
+  if (sectionSet.has('PDFs')) {
+    return 'PDF'
+  }
+  if (sectionSet.has('Books')) {
+    return 'Collection'
+  }
+  if (sectionSet.has('Notes')) {
+    return 'Guide'
+  }
+  if (sectionSet.has('Articles') || sectionSet.has('Research Papers') || sectionSet.has('Gujarati Content')) {
+    return 'Article'
+  }
+  return 'Article'
+}
+
 function ContentForm({ onSubmit, initialData = null }) {
   const [formData, setFormData] = useState(
     initialData || {
       title: '',
       description: '',
-      format: 'Article',
       sections: [],
       visibility: 'Public',
       files: [],
@@ -73,7 +97,7 @@ function ContentForm({ onSubmit, initialData = null }) {
       const formDataToSend = new FormData()
       formDataToSend.append('title', formData.title)
       formDataToSend.append('description', formData.description)
-      formDataToSend.append('format', formData.format)
+      formDataToSend.append('format', getFormatFromSections(formData.sections))
       formDataToSend.append('sections', JSON.stringify(formData.sections))
       formDataToSend.append('visibility', formData.visibility)
       formDataToSend.append('status', 'Published')
@@ -91,7 +115,6 @@ function ContentForm({ onSubmit, initialData = null }) {
       setFormData({
         title: '',
         description: '',
-        format: 'Article',
         sections: [],
         visibility: 'Public',
         files: [],
@@ -133,7 +156,7 @@ function ContentForm({ onSubmit, initialData = null }) {
       )}
 
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-        {/* Title & Format */}
+        {/* Title */}
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <p className="admin-field-label">Title</p>
@@ -144,18 +167,6 @@ function ContentForm({ onSubmit, initialData = null }) {
               onChange={(e) => handleChange('title', e.target.value)}
               required
             />
-          </div>
-          <div>
-            <p className="admin-field-label">Format</p>
-            <select
-              className="admin-select mt-2 w-full"
-              value={formData.format}
-              onChange={(e) => handleChange('format', e.target.value)}
-            >
-              {FORMATS.map((format) => (
-                <option key={format}>{format}</option>
-              ))}
-            </select>
           </div>
         </div>
 

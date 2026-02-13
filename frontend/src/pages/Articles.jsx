@@ -5,8 +5,10 @@ import { useContent } from '../context/ContentContext'
 const tags = ['UX', 'Metadata', 'Pedagogy', 'Research', 'Library']
 
 function Articles() {
-  const { loading, getNormalizedByFormat } = useContent()
-  const articles = getNormalizedByFormat('Article')
+  const { loading, getNormalizedBySection, getNormalizedByFormat } = useContent()
+  const sectionArticles = getNormalizedBySection('Articles')
+  const formatArticles = getNormalizedByFormat('Article')
+  const articles = sectionArticles.length > 0 ? sectionArticles : formatArticles
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1.8fr_0.8fr]">
