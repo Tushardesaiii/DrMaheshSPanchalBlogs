@@ -3,14 +3,18 @@ import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 
 const sections = [
-  'Literature',
-  'Competitive Exams',
-  'Learning Resources',
   'Research Papers',
   'Library Reports',
   'Gujarati Content',
-  'Scholarships',
   'Events & Workshops',
+  'Conferences',
+  'Workshops',
+  'Reports',
+  'Gallery',
+  'Books',
+  'PDFs',
+  'Articles',
+  'Notes',
 ]
 
 const formats = ['Book', 'PDF', 'Collection']

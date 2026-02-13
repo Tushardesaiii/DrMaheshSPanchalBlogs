@@ -1,7 +1,11 @@
 import { useLocation, useParams, Link } from 'react-router-dom'
-import { ChevronLeft, Calendar as CalendarIcon, MapPin, ArrowRight, Image as ImageIcon, Users, Presentation, BarChart3 } from 'lucide-react'
+import { ChevronLeft, Image as ImageIcon, Users, Presentation, BarChart3 } from 'lucide-react'
 
 import Button from '../components/ui/Button'
+import EventCard from '../components/cards/EventCard'
+import BookCard from '../components/cards/BookCard'
+import ArticleCard from '../components/cards/ArticleCard'
+import { useContent } from '../context/ContentContext'
 
 // Icon Mapping helper
 const IconMap = {
@@ -49,12 +53,25 @@ function ActivityPage() {
   const location = useLocation()
   const slug = collection ?? location.pathname.split('/').filter(Boolean).pop()
   const data = COLLECTIONS_DATA[slug]
+  const { loading, getNormalizedBySection } = useContent()
 
   if (!data || data.type !== 'activity') {
     return <div className="py-20 text-center font-serif italic">Activity archive not found.</div>
   }
 
   const Icon = IconMap[data.icon]
+  const sectionName = data?.title
+  const sectionItems = sectionName ? getNormalizedBySection(sectionName) : []
+
+  const renderCard = (item) => {
+    if (item.format === 'Event Notice') {
+      return <EventCard key={item.id} event={item} />
+    }
+    if (['PDF', 'Report', 'Guide', 'Collection'].includes(item.format)) {
+      return <BookCard key={item.id} book={item} />
+    }
+    return <ArticleCard key={item.id} article={item} />
+  }
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
@@ -89,44 +106,16 @@ function ActivityPage() {
         </div>
       </div>
 
-      {/* 2. Timeline-style Activity Grid */}
+      {/* 2. Activity Grid */}
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid grid-cols-1 gap-12">
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="group relative grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 items-center bg-white rounded-[3rem] p-4 border border-slate-100 transition-all hover:shadow-md hover:border-blue-100">
-              
-              {/* Image/Visual Part */}
-              <div className="aspect-video md:aspect-square rounded-[2.5rem] bg-slate-100 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-slate-300">
-                   <ImageIcon size={48} strokeWidth={1} />
-                </div>
-                <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md rounded-2xl px-4 py-2 text-center shadow-xl">
-                   <p className="text-[10px] font-black uppercase text-slate-400 leading-none">Feb</p>
-                   <p className="text-lg font-bold text-slate-900">1{item}</p>
-                </div>
-              </div>
-
-              {/* Content Part */}
-              <div className="pr-8 py-4">
-                <div className="flex items-center gap-4 mb-4 text-[10px] font-black uppercase tracking-widest text-blue-600">
-                   <span className="flex items-center gap-1"><CalendarIcon size={12} /> 2026 Archive</span>
-                   <span className="flex items-center gap-1"><MapPin size={12} /> Main Campus</span>
-                </div>
-                <h3 className="text-3xl font-bold tracking-tight text-slate-900 mb-4 group-hover:text-blue-600 transition-colors">
-                  Annual {data.title} Proceedings: Volume {item}
-                </h3>
-                <p className="text-slate-500 leading-relaxed mb-8">
-                  A detailed documentation of the academic initiatives, participant lists, and key outcomes recorded during this {data.title.toLowerCase()}.
-                </p>
-                <div className="flex items-center gap-6">
-                  <Button className="rounded-full bg-slate-900 hover:bg-blue-600">View Details</Button>
-                  <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
-                     Download Report <ArrowRight size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {loading ? (
+            <p className="col-span-3 text-sm text-slate-500">Loading archive...</p>
+          ) : sectionItems.length > 0 ? (
+            sectionItems.map((item) => renderCard(item))
+          ) : (
+            <p className="col-span-3 text-sm text-slate-500">No content found for this section.</p>
+          )}
         </div>
       </section>
     </div>

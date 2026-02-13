@@ -8,7 +8,7 @@ const eventRows = [
   { title: 'Academic Writing Clinic', format: 'Event Notice', section: 'Events & Workshops', status: 'Draft' },
 ]
 
-const eventCategories = ['Conference', 'Workshop', 'Report', 'Gallery', 'Seminar']
+const eventCategories = ['Conferences', 'Workshops', 'Reports', 'Gallery']
 
 function Events() {
   return (

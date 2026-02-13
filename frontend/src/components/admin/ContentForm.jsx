@@ -4,14 +4,18 @@ import Button from '../ui/Button'
 import Input from '../ui/Input'
 
 const SECTIONS = [
-  'Literature',
-  'Competitive Exams',
-  'Learning Resources',
   'Research Papers',
   'Library Reports',
   'Gujarati Content',
-  'Scholarships',
   'Events & Workshops',
+  'Conferences',
+  'Workshops',
+  'Reports',
+  'Gallery',
+  'Books',
+  'PDFs',
+  'Articles',
+  'Notes',
 ]
 
 const FORMATS = ['Article', 'PDF', 'Report', 'Guide', 'Collection', 'Event Notice']

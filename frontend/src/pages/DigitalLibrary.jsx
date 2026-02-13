@@ -11,8 +11,18 @@ function DigitalLibrary() {
   const location = useLocation()
   const slug = collection ?? location.pathname.split('/').filter(Boolean).pop()
   const data = COLLECTIONS_DATA[slug]
-  const { loading, getNormalizedByFormats } = useContent()
+  const { loading, getNormalizedByFormats, getNormalizedBySection } = useContent()
   const libraryItems = getNormalizedByFormats(['PDF', 'Guide', 'Report', 'Collection'])
+  const sectionFilters = {
+    books: 'Books',
+    pdfs: 'PDFs',
+    notes: 'Notes',
+    articles: 'Articles',
+  }
+  const sectionName = sectionFilters[slug]
+  const sectionItems = sectionName ? getNormalizedBySection(sectionName) : []
+  const pdfItems = getNormalizedByFormats(['PDF'])
+  const articleItems = getNormalizedByFormats(['Article'])
 
   if (!data || data.type !== 'library') {
     return <div className="py-20 text-center font-serif italic">Library collection not found.</div>
@@ -32,16 +42,40 @@ function DigitalLibrary() {
           ))}
         </div>
       </div>
-      {slug === 'library' || slug === 'books' ? (
+      {slug === 'library' || slug === 'books' || slug === 'pdfs' || slug === 'notes' || slug === 'articles' ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             <p className="col-span-3 text-(--color-muted)">Loading library items...</p>
-          ) : libraryItems.length > 0 ? (
-            libraryItems.map((book) => (
+          ) : slug === 'library' ? (
+            libraryItems.length > 0 ? (
+              libraryItems.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))
+            ) : (
+              <p className="col-span-3 text-(--color-muted)">No library items found.</p>
+            )
+          ) : slug === 'pdfs' ? (
+            (sectionItems.length > 0 ? sectionItems : pdfItems).length > 0 ? (
+              (sectionItems.length > 0 ? sectionItems : pdfItems).map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))
+            ) : (
+              <p className="col-span-3 text-(--color-muted)">No items found for this section.</p>
+            )
+          ) : slug === 'articles' ? (
+            (sectionItems.length > 0 ? sectionItems : articleItems).length > 0 ? (
+              (sectionItems.length > 0 ? sectionItems : articleItems).map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))
+            ) : (
+              <p className="col-span-3 text-(--color-muted)">No items found for this section.</p>
+            )
+          ) : sectionItems.length > 0 ? (
+            sectionItems.map((book) => (
               <BookCard key={book.id} book={book} />
             ))
           ) : (
-            <p className="col-span-3 text-(--color-muted)">No library items found.</p>
+            <p className="col-span-3 text-(--color-muted)">No items found for this section.</p>
           )}
         </div>
       ) : (
