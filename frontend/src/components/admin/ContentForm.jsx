@@ -174,8 +174,9 @@ function ContentForm({ onSubmit, initialData = null }) {
         <div>
           <p className="admin-field-label">Description</p>
           <textarea
-            className="admin-textarea mt-2 w-full"
-            rows="4"
+            className="admin-textarea mt-2 w-full resize-none overflow-y-auto"
+            rows="6"
+            style={{ minHeight: '150px', maxHeight: '400px' }}
             placeholder="Short description for cards and previews."
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}

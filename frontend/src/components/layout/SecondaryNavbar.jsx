@@ -25,7 +25,7 @@ export default function SecondaryNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-[#B89B5E] bg-[#1F3A33] text-[#F3EBDD] shadow-md">
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3">
+      <div className="mx-auto flex max-w-350 items-center justify-between px-6 py-3">
 
         {/* Brand */}
         <NavLink to="/" className="group flex flex-col">
@@ -61,8 +61,8 @@ export default function SecondaryNavbar() {
                           `group/item flex items-center justify-between px-4 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all
                             ${
                               isActive
-                                ? "!bg-[#1F3A33] !text-[#F3EBDD]" // Forced Active Colors
-                                : "!text-[#1F3A33] bg-transparent hover:!bg-[#B89B5E] hover:!text-[#1F3A33]" // Forced Inactive/Hover Colors
+                                ? "bg-[#1F3A33]! text-[#F3EBDD]!" // Forced Active Colors
+                                : "text-[#1F3A33]! bg-transparent hover:bg-[#B89B5E]! hover:text-[#1F3A33]!" // Forced Inactive/Hover Colors
                             }`
                         }
                       >
