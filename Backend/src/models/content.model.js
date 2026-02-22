@@ -2,9 +2,15 @@ import mongoose from "mongoose";
 
 const fileSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    type: { type: String, required: true },
-    url: { type: String, required: true },
+    name: { type: String, required: true }, // Original filename
+    type: { type: String, required: true }, // MIME type
+    url: { type: String, required: true }, // Cloudinary URL
+    publicId: { type: String }, // Cloudinary public ID for management
+    resourceType: { type: String }, // image, video, raw
+    format: { type: String }, // File format (jpg, pdf, xlsx, etc.)
+    size: { type: Number }, // File size in bytes
+    width: { type: Number }, // For images/videos
+    height: { type: Number }, // For images/videos
   },
   { _id: false }
 );

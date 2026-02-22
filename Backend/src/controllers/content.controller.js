@@ -60,18 +60,33 @@ const createContent = asyncHandler(async (req, res) => {
   if (req.files && req.files.length > 0) {
     console.log("Processing", req.files.length, "files...");
     for (const file of req.files) {
-      console.log("Uploading to Cloudinary:", file.originalname);
-      const cloudinaryResponse = await uploadOnCloudinary(file.path, {
-        resource_type: "auto",
-        folder: "content",
-      });
+      console.log("Uploading to Cloudinary:", file.originalname, "MIME type:", file.mimetype);
+      
+      // Pass file metadata to the upload function
+      const cloudinaryResponse = await uploadOnCloudinary(
+        file.path,
+        {
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+        },
+        {
+          folder: "content",
+        }
+      );
 
       if (cloudinaryResponse) {
-        console.log("Cloudinary upload success:", cloudinaryResponse.secure_url);
+        console.log("Cloudinary upload success:", cloudinaryResponse.url);
+        console.log("Resource type:", cloudinaryResponse.resourceType);
         files.push({
-          name: file.originalname,
-          type: file.mimetype,
-          url: cloudinaryResponse.secure_url,
+          name: cloudinaryResponse.originalFilename,
+          type: cloudinaryResponse.mimeType,
+          url: cloudinaryResponse.url,
+          publicId: cloudinaryResponse.publicId,
+          resourceType: cloudinaryResponse.resourceType,
+          format: cloudinaryResponse.format,
+          size: cloudinaryResponse.size,
+          width: cloudinaryResponse.width,
+          height: cloudinaryResponse.height,
         });
       } else {
         console.warn("Cloudinary upload failed for:", file.originalname);
@@ -149,16 +164,30 @@ const updateContent = asyncHandler(async (req, res) => {
   if (req.files && req.files.length > 0) {
     files = [];
     for (const file of req.files) {
-      const cloudinaryResponse = await uploadOnCloudinary(file.path, {
-        resource_type: "auto",
-        folder: "content",
-      });
+      console.log("Uploading to Cloudinary:", file.originalname, "MIME type:", file.mimetype);
+      
+      const cloudinaryResponse = await uploadOnCloudinary(
+        file.path,
+        {
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+        },
+        {
+          folder: "content",
+        }
+      );
 
       if (cloudinaryResponse) {
         files.push({
-          name: file.originalname,
-          type: file.mimetype,
-          url: cloudinaryResponse.secure_url,
+          name: cloudinaryResponse.originalFilename,
+          type: cloudinaryResponse.mimeType,
+          url: cloudinaryResponse.url,
+          publicId: cloudinaryResponse.publicId,
+          resourceType: cloudinaryResponse.resourceType,
+          format: cloudinaryResponse.format,
+          size: cloudinaryResponse.size,
+          width: cloudinaryResponse.width,
+          height: cloudinaryResponse.height,
         });
       }
     }

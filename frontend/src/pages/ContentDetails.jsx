@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, File } from 'lucide-react'
+import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, File, X, ExternalLink, ZoomIn } from 'lucide-react'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
@@ -11,6 +11,7 @@ function ContentDetails() {
   const [content, setContent] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [fullscreenImage, setFullscreenImage] = useState(null)
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -66,14 +67,36 @@ function ContentDetails() {
   }
 
   const getFileType = (file) => {
+    // First check if we have resourceType from backend
+    if (file.resourceType) {
+      if (file.resourceType === 'image') return 'image'
+      if (file.resourceType === 'video') return 'video'
+      if (file.resourceType === 'raw') {
+        // Further categorize raw files
+        const format = file.format?.toLowerCase() || ''
+        if (format === 'pdf') return 'pdf'
+        if (['xlsx', 'xls', 'csv'].includes(format)) return 'excel'
+        if (['docx', 'doc'].includes(format)) return 'word'
+        return 'document'
+      }
+    }
+    
+    // Fallback to MIME type and URL checking
     const mimeType = file.type?.toLowerCase() || ''
     const url = file.url?.toLowerCase() || ''
+    const fileName = file.name?.toLowerCase() || ''
     
     if (mimeType.startsWith('image/') || url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
       return 'image'
     }
-    if (mimeType.includes('pdf') || url.includes('.pdf') || url.includes('/pdf/') || url.includes('application/pdf')) {
+    if (mimeType.includes('pdf') || fileName.endsWith('.pdf') || url.includes('.pdf')) {
       return 'pdf'
+    }
+    if (mimeType.includes('sheet') || mimeType.includes('excel') || fileName.match(/\.(xlsx?|csv)$/)) {
+      return 'excel'
+    }
+    if (mimeType.includes('document') || mimeType.includes('word') || fileName.match(/\.docx?$/)) {
+      return 'word'
     }
     if (mimeType.startsWith('video/') || url.match(/\.(mp4|webm|ogg|mov)$/)) {
       return 'video'
@@ -81,25 +104,57 @@ function ContentDetails() {
     return 'document'
   }
 
-  const getCloudinaryThumbnail = (url, fileType) => {
+  const getCloudinaryThumbnail = (url, fileType, file = {}) => {
     if (!url || !url.includes('cloudinary.com')) {
       return url
     }
     
     try {
-      // For PDFs on Cloudinary, generate thumbnail
+      // For PDFs, don't try to generate thumbnails from raw files
+      // This causes 401 errors as raw files don't support image transformations
       if (fileType === 'pdf') {
-        // Replace /upload/ with /upload/w_800,h_600,c_fit,f_jpg,pg_1/
-        return url.replace('/upload/', '/upload/w_800,h_600,c_fit,f_jpg,pg_1/')
+        // Return original URL - we'll show an icon instead
+        return url
       }
-      // For images, optimize
+      
+      // For images, optimize and resize
       if (fileType === 'image') {
-        return url.replace('/upload/', '/upload/w_1200,q_auto,f_auto/')
+        return url.replace('/upload/', '/upload/w_1200,h_1200,c_limit,q_auto,f_auto/')
       }
+      
+      // For other file types, return as-is
       return url
     } catch (e) {
+      console.error('Error generating thumbnail:', e)
       return url
     }
+  }
+
+  const handleDownload = async (file) => {
+    try {
+      const response = await fetch(file.url)
+      const blob = await response.blob()
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = file.name || 'download'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+    } catch (error) {
+      console.error('Download error:', error)
+      // Fallback: open in new tab
+      window.open(file.url, '_blank')
+    }
+  }
+
+  const openFullscreen = (file) => {
+    setFullscreenImage(file)
+  }
+
+  const closeFullscreen = () => {
+    setFullscreenImage(null)
   }
 
   const getFileIcon = (type) => {
@@ -107,6 +162,8 @@ function ContentDetails() {
       case 'image': return <ImageIcon size={20} />
       case 'pdf': return <FileText size={20} />
       case 'video': return <FileText size={20} />
+      case 'excel': return <File size={20} />
+      case 'word': return <File size={20} />
       default: return <File size={20} />
     }
   }
@@ -118,10 +175,36 @@ function ContentDetails() {
   const imageFiles = files.filter(f => getFileType(f) === 'image')
   const pdfFiles = files.filter(f => getFileType(f) === 'pdf')
   const videoFiles = files.filter(f => getFileType(f) === 'video')
-  const documentFiles = files.filter(f => getFileType(f) === 'document')
+  const excelFiles = files.filter(f => getFileType(f) === 'excel')
+  const wordFiles = files.filter(f => getFileType(f) === 'word')
+  const documentFiles = files.filter(f => {
+    const type = getFileType(f)
+    return !['image', 'pdf', 'video', 'excel', 'word'].includes(type)
+  })
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-6 py-12">
+      {/* Fullscreen Modal */}
+      {fullscreenImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center p-4"
+          onClick={closeFullscreen}
+        >
+          <button
+            onClick={closeFullscreen}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+          >
+            <X size={32} />
+          </button>
+          <img
+            src={fullscreenImage.url}
+            alt={fullscreenImage.name}
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
       {/* Back Navigation */}
       <button
         onClick={() => navigate(-1)}
@@ -183,20 +266,35 @@ function ContentDetails() {
           </Card>
         )}
 
-        {/* Image Gallery - LinkedIn Style */}
+        {/* Image Gallery - LinkedIn Style with Fullscreen Support */}
         {imageFiles.length > 0 && (
           <div className="space-y-2">
             {imageFiles.length === 1 ? (
-              <div className="overflow-hidden rounded-xl border border-(--color-border) bg-slate-50">
+              <div className="overflow-hidden rounded-xl border border-(--color-border) bg-slate-50 group relative">
                 <img
-                  src={getCloudinaryThumbnail(imageFiles[0].url, 'image')}
+                  src={getCloudinaryThumbnail(imageFiles[0].url, 'image', imageFiles[0])}
                   alt={imageFiles[0].name}
-                  className="w-full max-h-[600px] object-contain"
+                  className="w-full max-h-[600px] object-contain cursor-pointer"
+                  onClick={() => openFullscreen(imageFiles[0])}
                   onError={(e) => {
                     e.target.onerror = null
                     e.target.src = imageFiles[0].url
                   }}
                 />
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                  <button
+                    onClick={() => openFullscreen(imageFiles[0])}
+                    className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                  >
+                    <ZoomIn size={20} />
+                  </button>
+                  <button
+                    onClick={() => handleDownload(imageFiles[0])}
+                    className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                  >
+                    <Download size={20} />
+                  </button>
+                </div>
                 <div className="bg-white/95 backdrop-blur-sm px-4 py-2 border-t border-(--color-border)">
                   <p className="text-xs text-(--color-muted) truncate">{imageFiles[0].name}</p>
                 </div>
@@ -204,17 +302,32 @@ function ContentDetails() {
             ) : imageFiles.length === 2 ? (
               <div className="grid grid-cols-2 gap-2">
                 {imageFiles.map((file, index) => (
-                  <div key={index} className="overflow-hidden rounded-xl border border-(--color-border)">
+                  <div key={index} className="overflow-hidden rounded-xl border border-(--color-border) group relative">
                     <div className="bg-slate-50">
                       <img
-                        src={getCloudinaryThumbnail(file.url, 'image')}
+                        src={getCloudinaryThumbnail(file.url, 'image', file)}
                         alt={file.name}
-                        className="w-full h-80 object-cover"
+                        className="w-full h-80 object-cover cursor-pointer"
+                        onClick={() => openFullscreen(file)}
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = file.url
                         }}
                       />
+                    </div>
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <button
+                        onClick={() => openFullscreen(file)}
+                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                      >
+                        <ZoomIn size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                      >
+                        <Download size={16} />
+                      </button>
                     </div>
                     <div className="bg-white px-3 py-2">
                       <p className="text-xs text-(--color-muted) truncate">{file.name}</p>
@@ -224,34 +337,64 @@ function ContentDetails() {
               </div>
             ) : imageFiles.length === 3 ? (
               <div className="grid grid-cols-2 gap-2">
-                <div className="row-span-2 overflow-hidden rounded-xl border border-(--color-border)">
+                <div className="row-span-2 overflow-hidden rounded-xl border border-(--color-border) group relative">
                   <div className="bg-slate-50">
                     <img
-                      src={getCloudinaryThumbnail(imageFiles[0].url, 'image')}
+                      src={getCloudinaryThumbnail(imageFiles[0].url, 'image', imageFiles[0])}
                       alt={imageFiles[0].name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover cursor-pointer"
+                      onClick={() => openFullscreen(imageFiles[0])}
                       onError={(e) => {
                         e.target.onerror = null
                         e.target.src = imageFiles[0].url
                       }}
                     />
                   </div>
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <button
+                      onClick={() => openFullscreen(imageFiles[0])}
+                      className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                    >
+                      <ZoomIn size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDownload(imageFiles[0])}
+                      className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                    >
+                      <Download size={16} />
+                    </button>
+                  </div>
                   <div className="bg-white px-3 py-2">
                     <p className="text-xs text-(--color-muted) truncate">{imageFiles[0].name}</p>
                   </div>
                 </div>
                 {imageFiles.slice(1).map((file, index) => (
-                  <div key={index} className="overflow-hidden rounded-xl border border-(--color-border)">
+                  <div key={index} className="overflow-hidden rounded-xl border border-(--color-border) group relative">
                     <div className="bg-slate-50">
                       <img
-                        src={getCloudinaryThumbnail(file.url, 'image')}
+                        src={getCloudinaryThumbnail(file.url, 'image', file)}
                         alt={file.name}
-                        className="w-full h-40 object-cover"
+                        className="w-full h-40 object-cover cursor-pointer"
+                        onClick={() => openFullscreen(file)}
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = file.url
                         }}
                       />
+                    </div>
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <button
+                        onClick={() => openFullscreen(file)}
+                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                      >
+                        <ZoomIn size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                      >
+                        <Download size={16} />
+                      </button>
                     </div>
                     <div className="bg-white px-3 py-2">
                       <p className="text-xs text-(--color-muted) truncate">{file.name}</p>
@@ -264,13 +407,14 @@ function ContentDetails() {
                 {imageFiles.slice(0, 4).map((file, index) => (
                   <div 
                     key={index} 
-                    className="relative overflow-hidden rounded-xl border border-(--color-border)"
+                    className="relative overflow-hidden rounded-xl border border-(--color-border) group"
                   >
                     <div className="bg-slate-50">
                       <img
-                        src={getCloudinaryThumbnail(file.url, 'image')}
+                        src={getCloudinaryThumbnail(file.url, 'image', file)}
                         alt={file.name}
-                        className="w-full h-64 object-cover"
+                        className="w-full h-64 object-cover cursor-pointer"
+                        onClick={() => openFullscreen(file)}
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = file.url
@@ -282,6 +426,20 @@ function ContentDetails() {
                         <span className="text-white text-3xl font-bold">+{imageFiles.length - 4}</span>
                       </div>
                     )}
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <button
+                        onClick={() => openFullscreen(file)}
+                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                      >
+                        <ZoomIn size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                      >
+                        <Download size={16} />
+                      </button>
+                    </div>
                     <div className="bg-white px-3 py-2">
                       <p className="text-xs text-(--color-muted) truncate">{file.name}</p>
                     </div>
@@ -292,44 +450,25 @@ function ContentDetails() {
           </div>
         )}
 
-        {/* PDF Previews - LinkedIn Style */}
+        {/* PDF Previews - Enhanced with Icon Display */}
         {pdfFiles.length > 0 && (
           <div className="space-y-4">
             {pdfFiles.map((file, index) => {
-              const thumbnailUrl = getCloudinaryThumbnail(file.url, 'pdf')
               return (
                 <Card key={index} className="p-0 overflow-hidden group">
-                  {/* PDF Thumbnail Preview */}
-                  <div className="relative bg-slate-50">
-                    <a
-                      href={file.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      <img
-                        src={thumbnailUrl}
-                        alt={`${file.name} preview`}
-                        className="w-full h-96 object-contain bg-gradient-to-br from-slate-50 to-slate-100"
-                        onError={(e) => {
-                          e.target.onerror = null
-                          e.target.style.display = 'none'
-                          e.target.nextElementSibling.style.display = 'flex'
-                        }}
-                      />
-                      {/* Fallback if thumbnail fails */}
-                      <div className="hidden w-full h-96 items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
-                        <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-red-500 text-white shadow-xl">
-                          <FileText size={48} strokeWidth={2} />
-                        </div>
+                  {/* PDF Icon Display */}
+                  <div className="relative bg-gradient-to-br from-red-50 to-orange-50 cursor-pointer" onClick={() => window.open(file.url, '_blank')}>
+                    <div className="w-full h-96 flex items-center justify-center">
+                      <div className="flex h-32 w-32 items-center justify-center rounded-3xl bg-red-500 text-white shadow-2xl group-hover:scale-110 transition-transform">
+                        <FileText size={64} strokeWidth={2} />
                       </div>
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <div className="bg-white rounded-full p-4 shadow-xl transform scale-90 group-hover:scale-100 transition-transform">
-                          <FileText size={32} className="text-red-500" />
-                        </div>
+                    </div>
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center">
+                      <div className="bg-white rounded-full p-4 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                        <ExternalLink size={32} className="text-red-500" />
                       </div>
-                    </a>
+                    </div>
                   </div>
                   
                   {/* PDF Info Footer */}
@@ -337,26 +476,23 @@ function ContentDetails() {
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0 pr-4">
                         <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
-                        <p className="text-xs text-(--color-muted)">PDF Document</p>
+                        <p className="text-xs text-(--color-muted)">PDF Document {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
-                        <a
-                          href={file.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => window.open(file.url, '_blank')}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-red-600 hover:shadow-lg"
                         >
-                          <FileText size={14} />
+                          <ExternalLink size={14} />
                           Open
-                        </a>
-                        <a
-                          href={file.url}
-                          download
+                        </button>
+                        <button
+                          onClick={() => handleDownload(file)}
                           className="inline-flex items-center gap-1.5 rounded-lg border-2 border-red-500 px-3 py-2 text-xs font-bold text-red-500 transition-all hover:bg-red-50"
                         >
                           <Download size={14} />
                           Save
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -375,14 +511,101 @@ function ContentDetails() {
                   controls
                   className="w-full max-h-[600px] bg-black"
                   preload="metadata"
-                  poster={file.url.replace('/upload/', '/upload/w_800,f_jpg,so_0/')}
                 >
                   <source src={file.url} type={file.type || 'video/mp4'} />
                   Your browser does not support the video tag.
                 </video>
                 <div className="bg-white border-t border-(--color-border) px-4 py-2">
                   <p className="text-sm text-(--color-primary) truncate">{file.name}</p>
-                  <p className="text-xs text-(--color-muted)">Video</p>
+                  <p className="text-xs text-(--color-muted)">Video {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Excel Files */}
+        {excelFiles.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="section-title text-lg text-(--color-primary)">Spreadsheets</h3>
+            {excelFiles.map((file, index) => (
+              <Card
+                key={index}
+                className="p-0 overflow-hidden group hover:shadow-lg transition-all"
+              >
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 flex items-center justify-center min-h-[200px] relative">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-green-600 text-white shadow-xl group-hover:scale-110 transition-transform">
+                    <File size={40} strokeWidth={2} />
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                </div>
+                <div className="bg-white border-t border-(--color-border) p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
+                      <p className="text-xs text-(--color-muted)">Excel Spreadsheet {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => window.open(file.url, '_blank')}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-green-700"
+                      >
+                        <ExternalLink size={14} />
+                        Open
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-green-600 px-3 py-2 text-xs font-bold text-green-600 transition-all hover:bg-green-50"
+                      >
+                        <Download size={14} />
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Word Documents */}
+        {wordFiles.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="section-title text-lg text-(--color-primary)">Word Documents</h3>
+            {wordFiles.map((file, index) => (
+              <Card
+                key={index}
+                className="p-0 overflow-hidden group hover:shadow-lg transition-all"
+              >
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 flex items-center justify-center min-h-[200px] relative">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-xl group-hover:scale-110 transition-transform">
+                    <FileText size={40} strokeWidth={2} />
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                </div>
+                <div className="bg-white border-t border-(--color-border) p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
+                      <p className="text-xs text-(--color-muted)">Word Document {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => window.open(file.url, '_blank')}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+                      >
+                        <ExternalLink size={14} />
+                        Open
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-blue-600 px-3 py-2 text-xs font-bold text-blue-600 transition-all hover:bg-blue-50"
+                      >
+                        <Download size={14} />
+                        Download
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -392,37 +615,42 @@ function ContentDetails() {
         {/* Other Documents */}
         {documentFiles.length > 0 && (
           <div className="space-y-3">
+            <h3 className="section-title text-lg text-(--color-primary)">Other Files</h3>
             {documentFiles.map((file, index) => (
               <Card
                 key={index}
                 className="p-0 overflow-hidden group hover:shadow-lg transition-all"
               >
-                <a
-                  href={file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="block"
-                >
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 flex items-center justify-center min-h-[200px] relative">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-xl group-hover:scale-110 transition-transform">
-                      {getFileIcon('document')}
-                    </div>
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-8 flex items-center justify-center min-h-[200px] relative">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-purple-500 text-white shadow-xl group-hover:scale-110 transition-transform">
+                    {getFileIcon('document')}
                   </div>
-                  <div className="bg-white border-t border-(--color-border) p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0 pr-4">
-                        <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
-                        <p className="text-xs text-(--color-muted)">{file.type || 'Document'}</p>
-                      </div>
-                      <div className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white transition-colors group-hover:bg-blue-700 flex-shrink-0">
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                </div>
+                <div className="bg-white border-t border-(--color-border) p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
+                      <p className="text-xs text-(--color-muted)">{file.type || 'Document'} {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => window.open(file.url, '_blank')}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-purple-700"
+                      >
+                        <ExternalLink size={14} />
+                        Open
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-purple-600 px-3 py-2 text-xs font-bold text-purple-600 transition-all hover:bg-purple-50"
+                      >
                         <Download size={14} />
                         Download
-                      </div>
+                      </button>
                     </div>
                   </div>
-                </a>
+                </div>
               </Card>
             ))}
           </div>
