@@ -1,90 +1,92 @@
+
 import { useState } from 'react'
-import ContentForm from '../components/admin/ContentForm'
+import PostForm from '../components/admin/PostForm'
 import Card from '../components/ui/Card'
 import { useContent } from '../context/ContentContext'
-
+import { Trash2 } from 'lucide-react'
 function Dashboard() {
   const { contents, addContent, loading } = useContent()
-  const [filter, setFilter] = useState('all')
   const [error, setError] = useState('')
+
+  // Filter for posts/articles (not books)
+  const posts = contents.filter((item) => {
+    const hasBookSection = Array.isArray(item.sections) && item.sections.some((section) => ['Books', 'Collections', 'Educational Materials', 'Research Collections', 'Special Collections'].includes(section))
+    return item.format !== 'Collection' && !hasBookSection
+  })
+
 
   const handleAddContent = async (formData) => {
     setError('')
     try {
-      console.log('Dashboard: Adding content...')
       await addContent(formData)
-      console.log('Dashboard: Content added successfully')
     } catch (error) {
       console.error('Dashboard error:', error)
-      const msg = error?.message || 'Failed to add content'
+      const msg = error?.message || 'Failed to publish post'
       setError(msg)
       throw error
     }
   }
 
-  const filteredContents = filter === 'all'
-    ? contents
-    : contents.filter(c => c.status.toLowerCase() === filter.toLowerCase())
-
   return (
     <div className="space-y-8">
-      <ContentForm onSubmit={handleAddContent} />
+      {/* Posts Form */}
+      <PostForm onSubmit={handleAddContent} />
 
-      <Card className="admin-panel">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="admin-kicker">Content Queue</p>
-            <h3 className="admin-title mt-3 text-xl">Publishing Pipeline</h3>
-          </div>
-          <div className="flex gap-2">
-            {['all', 'published', 'scheduled', 'draft'].map(status => (
-              <button
-                key={status}
-                onClick={() => setFilter(status)}
-                className={`admin-chip ${filter === status ? 'admin-chip-strong' : ''}`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
+      {/* Posts History */}
+      <Card className="admin-panel p-8">
+        <div className="mb-6">
+          <p className="admin-kicker">Articles & Posts</p>
+          <h3 className="admin-title mt-3 text-2xl">Published Posts History</h3>
+          <p className="mt-2 text-sm text-(--color-muted)">Posts appear on article pages and search results</p>
         </div>
-        <div className="mt-6 overflow-x-auto">
-          {loading ? (
-            <p className="text-sm text-(--color-muted)">Loading content...</p>
-          ) : filteredContents.length === 0 ? (
-            <p className="text-sm text-(--color-muted)">No content found.</p>
-          ) : (
+
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-(--color-muted)">Loading posts...</p>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="rounded-lg border-2 border-dashed border-(--color-border) py-12 text-center">
+            <p className="text-(--color-muted)">No posts published yet. Use the form above to publish your first article.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
             <table className="admin-table w-full text-left text-sm">
               <thead>
-                <tr>
-                  <th className="pb-3">Title</th>
-                  <th className="pb-3">Format</th>
-                  <th className="pb-3">Sections</th>
-                  <th className="pb-3">Status</th>
+                <tr className="border-b border-(--color-border)">
+                  <th className="pb-3 font-semibold text-(--color-primary)">Title</th>
+                  <th className="pb-3 font-semibold text-(--color-primary)">Category</th>
+                  <th className="pb-3 font-semibold text-(--color-primary)">Status</th>
+                  <th className="pb-3 font-semibold text-(--color-primary)">Visibility</th>
+                  <th className="pb-3 font-semibold text-(--color-primary)">Actions</th>
                 </tr>
               </thead>
               <tbody className="text-(--color-text)">
-                {filteredContents.map((content) => (
-                  <tr key={content._id} className="border-t border-(--color-border)">
-                    <td className="py-3 max-w-xs truncate">{content.title}</td>
-                    <td className="py-3">{content.format}</td>
-                    <td className="py-3 text-xs">
-                      {content.sections && content.sections.slice(0, 2).map(s => (
-                        <span key={s} className="admin-chip admin-chip-strong mr-1">{s}</span>
-                      ))}
-                      {content.sections && content.sections.length > 2 && (
-                        <span className="text-(--color-muted)">+{content.sections.length - 2}</span>
-                      )}
+                {posts.map((post) => (
+                  <tr key={post._id} className="border-b border-(--color-border) hover:bg-(--admin-surface)">
+                    <td className="py-4">
+                      <div>
+                        <p className="font-medium">{post.title}</p>
+                        <p className="text-xs text-(--color-muted) mt-1 line-clamp-1">{post.description}</p>
+                      </div>
                     </td>
-                    <td className="py-3">
-                      <span className="admin-chip admin-chip-strong">{content.status}</span>
+                    <td className="py-4 text-sm">{post.sections?.[0] || post.format || '-'}</td>
+                    <td className="py-4">
+                      <span className="inline-block rounded-full bg-(--admin-surface) px-3 py-1 text-xs font-semibold text-(--color-accent)">
+                        {post.status || 'Published'}
+                      </span>
+                    </td>
+                    <td className="py-4 text-sm">{post.visibility || 'Public'}</td>
+                    <td className="py-4">
+                      <button className="rounded p-2 text-red-600 hover:bg-red-50 transition-colors">
+                        <Trash2 size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
       </Card>
     </div>
   )

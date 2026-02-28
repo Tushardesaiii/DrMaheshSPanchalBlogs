@@ -13,7 +13,7 @@ const eventCategories = ['Conferences', 'Workshops', 'Reports', 'Gallery']
 function Events() {
   return (
     <div className="space-y-8">
-      <Card className="admin-panel">
+      <Card className="admin-panel p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="admin-kicker">Event Publisher</p>
@@ -65,7 +65,7 @@ function Events() {
           <p className="text-xs text-(--color-muted)">Gallery images supported.</p>
         </label>
       </Card>
-      <Card className="admin-panel">
+      <Card className="admin-panel p-8">
         <div className="flex items-center justify-between">
           <h3 className="admin-title text-lg">Event Queue</h3>
           <span className="admin-chip">Events</span>

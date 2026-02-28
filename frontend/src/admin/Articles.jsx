@@ -28,7 +28,7 @@ const articleRows = [
 function Articles() {
   return (
     <div className="space-y-8">
-      <Card className="admin-panel">
+      <Card className="admin-panel p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="admin-kicker">Article Publisher</p>
@@ -73,7 +73,7 @@ function Articles() {
           <p className="text-xs text-(--color-muted)">Images, reports, or external links.</p>
         </label>
       </Card>
-      <Card className="admin-panel">
+      <Card className="admin-panel p-8">
         <div className="flex items-center justify-between">
           <h3 className="admin-title text-lg">Publishing Queue</h3>
           <span className="admin-chip">Articles</span>

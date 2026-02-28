@@ -3,65 +3,28 @@ import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 
-const SECTIONS = [
+const CATEGORIES = [
   'Research Papers',
-  'Library Reports',
-  'Gujarati Content',
-  'Events & Workshops',
-  'Conferences',
-  'Workshops',
-  'Reports',
-  'Gallery',
-  'Books',
-  'PDFs',
   'Articles',
+  'Gujarati Content',
   'Notes',
+  'Library Reports',
 ]
 
-const FORMATS = ['Article', 'PDF', 'Report', 'Guide', 'Collection', 'Event Notice']
-
-const getFormatFromSections = (sections) => {
-  if (!Array.isArray(sections) || sections.length === 0) return 'Article'
-
-  const sectionSet = new Set(sections)
-  if (sectionSet.has('Conferences') || sectionSet.has('Workshops') || sectionSet.has('Events & Workshops') || sectionSet.has('Gallery')) {
-    return 'Event Notice'
-  }
-  if (sectionSet.has('Reports') || sectionSet.has('Library Reports')) {
-    return 'Report'
-  }
-  if (sectionSet.has('PDFs')) {
-    return 'PDF'
-  }
-  if (sectionSet.has('Books')) {
-    return 'Collection'
-  }
-  if (sectionSet.has('Notes')) {
-    return 'Guide'
-  }
-  if (sectionSet.has('Articles') || sectionSet.has('Research Papers') || sectionSet.has('Gujarati Content')) {
-    return 'Article'
-  }
-  return 'Article'
-}
-
-function ContentForm({ onSubmit, initialData = null }) {
-  const [formData, setFormData] = useState(
-    initialData || {
-      title: '',
-      description: '',
-      sections: [],
-      visibility: 'Public',
-      files: [],
-      eventDate: '',
-      location: '',
-      eventTimeStart: '',
-      eventTimeEnd: '',
-      speaker: '',
-      externalUrl: '',
-      featured: false,
-    }
-  )
+function PostForm({ onSubmit }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    visibility: 'Public',
+    eventDate: '',
+    location: '',
+    eventTimeStart: '',
+    eventTimeEnd: '',
+    speaker: '',
+    externalUrl: '',
+    featured: false,
+  })
   const [fileInputs, setFileInputs] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
@@ -69,15 +32,6 @@ function ContentForm({ onSubmit, initialData = null }) {
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const toggleSection = (section) => {
-    setFormData(prev => ({
-      ...prev,
-      sections: prev.sections.includes(section)
-        ? prev.sections.filter(s => s !== section)
-        : [...prev.sections, section],
-    }))
   }
 
   const handleFileChange = (event) => {
@@ -96,7 +50,6 @@ function ContentForm({ onSubmit, initialData = null }) {
     setSuccessMessage('')
 
     try {
-      // Validate inputs
       if (!formData.title.trim() || !formData.description.trim()) {
         throw new Error('Title and description are required')
       }
@@ -104,12 +57,13 @@ function ContentForm({ onSubmit, initialData = null }) {
       const formDataToSend = new FormData()
       formDataToSend.append('title', formData.title)
       formDataToSend.append('description', formData.description)
-      formDataToSend.append('format', getFormatFromSections(formData.sections))
-      formDataToSend.append('sections', JSON.stringify(formData.sections))
+      formDataToSend.append('format', 'Article')
+      formDataToSend.append('sections', JSON.stringify([formData.category || 'Articles']))
       formDataToSend.append('visibility', formData.visibility)
       formDataToSend.append('status', 'Published')
+      formDataToSend.append('contentType', 'post')
       formDataToSend.append('tags', JSON.stringify([]))
-      
+
       // Append new fields if they have values
       if (formData.eventDate) formDataToSend.append('eventDate', formData.eventDate)
       if (formData.location) formDataToSend.append('location', formData.location)
@@ -123,17 +77,14 @@ function ContentForm({ onSubmit, initialData = null }) {
         formDataToSend.append('files', file)
       })
 
-      console.log('Submitting form with', fileInputs.length, 'files')
       await onSubmit(formDataToSend)
       
-      // Success!
       setSuccessMessage(`✅ "${formData.title}" published successfully!`)
       setFormData({
         title: '',
         description: '',
-        sections: [],
+        category: '',
         visibility: 'Public',
-        files: [],
         eventDate: '',
         location: '',
         eventTimeStart: '',
@@ -144,13 +95,10 @@ function ContentForm({ onSubmit, initialData = null }) {
       })
       setFileInputs([])
       
-      // Clear success message after 4 seconds
       setTimeout(() => setSuccessMessage(''), 4000)
     } catch (error) {
-      console.error('Submit error:', error)
-      const errorMsg = error?.message || 'Failed to publish content'
+      const errorMsg = error?.message || 'Failed to publish post'
       setErrorMessage(`❌ ${errorMsg}`)
-      console.error('Full error details:', error)
     } finally {
       setSubmitting(false)
     }
@@ -159,83 +107,89 @@ function ContentForm({ onSubmit, initialData = null }) {
   return (
     <Card className="admin-panel p-8">
       <div>
-        <p className="admin-kicker">Unified Content Publisher</p>
-        <h3 className="admin-title mt-3 text-2xl">Create & Publish Content</h3>
-        <p className="mt-2 text-sm text-(--color-muted)">Route content to multiple sections at once.</p>
+        <p className="admin-kicker">Article Publisher</p>
+        <h3 className="admin-title mt-3 text-2xl">Publish Article or Post</h3>
+        <p className="mt-2 text-sm text-(--color-muted)">Share your articles, research, and content.</p>
       </div>
 
-      {/* Success Message */}
       {successMessage && (
         <div className="mt-4 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-800">
           {successMessage}
         </div>
       )}
 
-      {/* Error Message */}
       {errorMessage && (
         <div className="mt-4 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800">
           {errorMessage}
         </div>
       )}
 
-      <form className="mt-8 space-y-8" onSubmit={handleSubmit}>
-        {/* Title */}
-        <div className="grid gap-4 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+        <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <p className="admin-field-label">Title</p>
+            <p className="admin-field-label">Article Title</p>
             <Input
               className="admin-input mt-2"
-              placeholder="Content title"
+              placeholder="Enter article title"
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
               required
             />
           </div>
+          <div>
+            <p className="admin-field-label">Category</p>
+            <select
+              className="admin-select mt-2"
+              value={formData.category}
+              onChange={(e) => handleChange('category', e.target.value)}
+            >
+              <option value="">Select a category</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Description */}
         <div>
           <p className="admin-field-label">Description</p>
           <textarea
-            className="admin-textarea mt-2 w-full resize-none overflow-y-auto"
-            rows="6"
-            style={{ minHeight: '150px', maxHeight: '400px' }}
-            placeholder="Short description for cards and previews."
+            className="admin-input mt-2 min-h-24 resize-none"
+            placeholder="Write your article description or content..."
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
             required
           />
         </div>
 
-        {/* Event Date */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <div>
             <p className="admin-field-label">Event/Publication Date</p>
-            <Input
+            <input
               type="date"
               className="admin-input mt-2"
               value={formData.eventDate}
               onChange={(e) => handleChange('eventDate', e.target.value)}
             />
-            <p className="mt-1 text-xs text-(--color-muted)">Optional: For events, workshops, or dated content</p>
+            <p className="mt-1 text-xs text-(--color-muted)">Optional: For events or dated content</p>
           </div>
           <div>
             <p className="admin-field-label">Location (Optional)</p>
             <Input
               className="admin-input mt-2"
-              placeholder="e.g., Conference Hall, Online, Mumbai"
+              placeholder="e.g., Conference Hall, Online"
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
             />
-            <p className="mt-1 text-xs text-(--color-muted)">Physical location or virtual platform</p>
           </div>
         </div>
 
-        {/* Event Time */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <div>
             <p className="admin-field-label">Start Time (Optional)</p>
-            <Input
+            <input
               type="time"
               className="admin-input mt-2"
               value={formData.eventTimeStart}
@@ -244,7 +198,7 @@ function ContentForm({ onSubmit, initialData = null }) {
           </div>
           <div>
             <p className="admin-field-label">End Time (Optional)</p>
-            <Input
+            <input
               type="time"
               className="admin-input mt-2"
               value={formData.eventTimeEnd}
@@ -253,8 +207,7 @@ function ContentForm({ onSubmit, initialData = null }) {
           </div>
         </div>
 
-        {/* Speaker/Author and External URL */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <div>
             <p className="admin-field-label">Speaker/Author (Optional)</p>
             <Input
@@ -263,7 +216,6 @@ function ContentForm({ onSubmit, initialData = null }) {
               value={formData.speaker}
               onChange={(e) => handleChange('speaker', e.target.value)}
             />
-            <p className="mt-1 text-xs text-(--color-muted)">Event speaker or content author</p>
           </div>
           <div>
             <p className="admin-field-label">External URL (Optional)</p>
@@ -274,39 +226,20 @@ function ContentForm({ onSubmit, initialData = null }) {
               value={formData.externalUrl}
               onChange={(e) => handleChange('externalUrl', e.target.value)}
             />
-            <p className="mt-1 text-xs text-(--color-muted)">Link to external resource or registration</p>
           </div>
         </div>
 
-        {/* Sections */}
-        <div>
-          <p className="admin-field-label">Route to Sections</p>
-          <div className="admin-pill-group mt-4">
-            {SECTIONS.map((section) => (
-              <label key={section} className="admin-pill">
-                <input
-                  type="checkbox"
-                  checked={formData.sections.includes(section)}
-                  onChange={() => toggleSection(section)}
-                />
-                <span>{section}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Visibility */}
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <div>
             <p className="admin-field-label">Visibility</p>
             <select
-              className="admin-select mt-2 w-full"
+              className="admin-select mt-2"
               value={formData.visibility}
               onChange={(e) => handleChange('visibility', e.target.value)}
             >
-              <option>Public</option>
-              <option>Members</option>
-              <option>Internal</option>
+              <option value="Public">Public</option>
+              <option value="Members">Members</option>
+              <option value="Internal">Internal</option>
             </select>
           </div>
           <div>
@@ -318,62 +251,49 @@ function ContentForm({ onSubmit, initialData = null }) {
                 onChange={(e) => handleChange('featured', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-(--color-primary)">Mark as featured content</span>
+              <span className="text-sm text-(--color-primary)">Mark as featured</span>
             </label>
           </div>
         </div>
 
-        {/* File Upload */}
-        <div>
+        <label className="admin-dropzone">
+          <input type="file" className="hidden" onChange={handleFileChange} multiple accept="image/*,.pdf,.doc,.docx" />
           <p className="admin-field-label">Attachments (Optional)</p>
-          <label className="admin-dropzone mt-2">
-            <input
-              type="file"
-              multiple
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <p className="text-sm text-(--color-muted)">Drop files here or click to upload.</p>
-            <p className="text-xs text-(--color-muted)">PDF, DOCX, images, or external links.</p>
-          </label>
-        </div>
+          <p className="text-sm text-(--color-muted)">Drop images, PDFs, or documents here.</p>
+          <p className="text-xs text-(--color-muted)">Supports images, PDFs, Word documents</p>
+        </label>
 
-        {/* File Preview */}
         {fileInputs.length > 0 && (
-          <div>
-            <p className="admin-field-label text-xs">Files to upload ({fileInputs.length})</p>
-            <div className="mt-4 space-y-3">
-              {fileInputs.map((file, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between rounded-lg border border-(--color-border) bg-white px-3 py-2 text-sm"
-                >
-                  <span className="text-(--color-primary)">{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(idx)}
-                    className="text-xs text-red-600 hover:underline"
-                  >
-                    Remove
-                  </button>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-(--color-primary)">Selected Files ({fileInputs.length})</p>
+            {fileInputs.map((file, idx) => (
+              <div key={idx} className="flex items-center justify-between rounded-lg bg-(--admin-surface) p-3 text-sm">
+                <div className="flex-1">
+                  <p className="font-medium">{file.name}</p>
+                  <p className="text-xs text-(--color-muted)">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                 </div>
-              ))}
-            </div>
+                <button
+                  type="button"
+                  onClick={() => removeFile(idx)}
+                  className="ml-4 rounded px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Submit */}
-        <div className="flex flex-wrap gap-4 border-t border-(--color-border) pt-8 mt-8">
-          <Button type="submit" className="admin-button" disabled={submitting}>
-            {submitting ? 'Publishing...' : 'Publish Now'}
-          </Button>
-          <Button type="button" variant="ghost" className="admin-button">
-            Save Draft
-          </Button>
-        </div>
+        <Button
+          className="admin-button w-full"
+          type="submit"
+          disabled={submitting}
+        >
+          {submitting ? 'Publishing...' : 'Publish Article'}
+        </Button>
       </form>
     </Card>
   )
 }
 
-export default ContentForm
+export default PostForm

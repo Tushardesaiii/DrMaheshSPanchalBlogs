@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, File, X, ExternalLink, ZoomIn } from 'lucide-react'
+import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, File, X, ExternalLink, ZoomIn, Lock, Globe, Tag } from 'lucide-react'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
@@ -12,6 +12,7 @@ function ContentDetails() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [fullscreenImage, setFullscreenImage] = useState(null)
+  const [imageIndex, setImageIndex] = useState(0)
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -41,16 +42,16 @@ function ContentDetails() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-(--color-muted)">Loading content...</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#fcfcf9]">
+        <p className="text-lg text-[#666666]">Loading article...</p>
       </div>
     )
   }
 
   if (error || !content) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center space-y-4">
-        <p className="text-lg text-red-600">Content not found</p>
+      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 bg-[#fcfcf9]">
+        <p className="text-lg text-red-600">Article not found</p>
         <Button onClick={() => navigate(-1)}>Go Back</Button>
       </div>
     )
@@ -67,12 +68,10 @@ function ContentDetails() {
   }
 
   const getFileType = (file) => {
-    // First check if we have resourceType from backend
     if (file.resourceType) {
       if (file.resourceType === 'image') return 'image'
       if (file.resourceType === 'video') return 'video'
       if (file.resourceType === 'raw') {
-        // Further categorize raw files
         const format = file.format?.toLowerCase() || ''
         if (format === 'pdf') return 'pdf'
         if (['xlsx', 'xls', 'csv'].includes(format)) return 'excel'
@@ -81,7 +80,6 @@ function ContentDetails() {
       }
     }
     
-    // Fallback to MIME type and URL checking
     const mimeType = file.type?.toLowerCase() || ''
     const url = file.url?.toLowerCase() || ''
     const fileName = file.name?.toLowerCase() || ''
@@ -104,32 +102,6 @@ function ContentDetails() {
     return 'document'
   }
 
-  const getCloudinaryThumbnail = (url, fileType, file = {}) => {
-    if (!url || !url.includes('cloudinary.com')) {
-      return url
-    }
-    
-    try {
-      // For PDFs, don't try to generate thumbnails from raw files
-      // This causes 401 errors as raw files don't support image transformations
-      if (fileType === 'pdf') {
-        // Return original URL - we'll show an icon instead
-        return url
-      }
-      
-      // For images, optimize and resize
-      if (fileType === 'image') {
-        return url.replace('/upload/', '/upload/w_1200,h_1200,c_limit,q_auto,f_auto/')
-      }
-      
-      // For other file types, return as-is
-      return url
-    } catch (e) {
-      console.error('Error generating thumbnail:', e)
-      return url
-    }
-  }
-
   const handleDownload = async (file) => {
     try {
       const response = await fetch(file.url)
@@ -144,28 +116,17 @@ function ContentDetails() {
       window.URL.revokeObjectURL(downloadUrl)
     } catch (error) {
       console.error('Download error:', error)
-      // Fallback: open in new tab
       window.open(file.url, '_blank')
     }
   }
 
-  const openFullscreen = (file) => {
+  const openFullscreen = (file, index) => {
     setFullscreenImage(file)
+    setImageIndex(index)
   }
 
   const closeFullscreen = () => {
     setFullscreenImage(null)
-  }
-
-  const getFileIcon = (type) => {
-    switch (type) {
-      case 'image': return <ImageIcon size={20} />
-      case 'pdf': return <FileText size={20} />
-      case 'video': return <FileText size={20} />
-      case 'excel': return <File size={20} />
-      case 'word': return <File size={20} />
-      default: return <File size={20} />
-    }
   }
 
   const tags = Array.isArray(content.tags) ? content.tags : []
@@ -174,517 +135,416 @@ function ContentDetails() {
   
   const imageFiles = files.filter(f => getFileType(f) === 'image')
   const pdfFiles = files.filter(f => getFileType(f) === 'pdf')
-  const videoFiles = files.filter(f => getFileType(f) === 'video')
-  const excelFiles = files.filter(f => getFileType(f) === 'excel')
-  const wordFiles = files.filter(f => getFileType(f) === 'word')
-  const documentFiles = files.filter(f => {
-    const type = getFileType(f)
-    return !['image', 'pdf', 'video', 'excel', 'word'].includes(type)
-  })
+  const documentFiles = files.filter(f => !['image', 'pdf', 'video'].includes(getFileType(f)))
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 px-6 py-12">
-      {/* Fullscreen Modal */}
+    <div className="min-h-screen bg-[#fcfcf9]">
+      {/* Fullscreen Image Modal - LinkedIn/Substack style */}
       {fullscreenImage && (
         <div 
-          className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={closeFullscreen}
         >
           <button
             onClick={closeFullscreen}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10"
+            className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors z-10 p-2 hover:bg-white/10 rounded-full"
           >
-            <X size={32} />
+            <X size={24} />
           </button>
           <img
             src={fullscreenImage.url}
             alt={fullscreenImage.name}
-            className="max-w-full max-h-full object-contain"
+            className="max-w-4xl max-h-[90vh] object-contain rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
 
-      {/* Back Navigation */}
-      <button
-        onClick={() => navigate(-1)}
-        className="group flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-(--color-muted) transition-colors hover:text-(--color-primary)"
-      >
-        <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
-        Back
-      </button>
+      <div className="mx-auto max-w-3xl px-6 py-12 md:py-16">{/*Main content width*/}
 
-      {/* Header */}
-      <header className="space-y-4 border-b border-(--color-border) pb-8">
-        <div className="flex flex-wrap gap-2">
-          {sections.map((section) => (
-            <Badge key={section}>{section}</Badge>
-          ))}
-          <Badge>{content.format}</Badge>
-        </div>
-        
-        <h1 className="section-title text-4xl md:text-5xl text-(--color-primary)">
-          {content.title}
-        </h1>
 
-        <div className="flex flex-wrap items-center gap-4 text-sm text-(--color-muted)">
-          <div className="flex items-center gap-2">
-            <User size={16} />
-            <span>By {content.author || 'Admin'}</span>
+        {/* Breadcrumb & Back Navigation */}
+        <button
+          onClick={() => navigate(-1)}
+          className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#666666] hover:text-[#1a1a1a] transition-all mb-8 hover:-translate-x-1"
+        >
+          <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+          Back
+        </button>
+
+        {/* Article Header - LinkedIn/Substack Style */}
+        <header className="mb-12 border-b border-gray-200 pb-8 space-y-6">
+          {/* Title */}
+          <h1 className="font-serif text-5xl leading-tight tracking-tight text-[#1a1a1a] md:text-6xl wrap-break-word">
+            {content.title}
+          </h1>
+
+          {/* Metadata Bar - Author, Date, Status */}
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              {/* Author Card */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-[#1a1a1a] font-bold text-sm">
+                  {(content.author || 'A').charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[#1a1a1a]">{content.author || 'Admin'}</p>
+                  <div className="flex items-center gap-2 text-xs text-[#666666]">
+                    <Calendar size={12} />
+                    <span>{formatDate(content.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Badge */}
+            {content.status && (
+              <Badge className="capitalize">
+                {content.status}
+              </Badge>
+            )}
           </div>
-          <div className="flex items-center gap-2">
-            <Calendar size={16} />
-            <span>{formatDate(content.createdAt)}</span>
-          </div>
-        </div>
-      </header>
 
-      {/* Main Content */}
-      <article className="space-y-6">
-        <Card className="p-8">
-          <div className="prose prose-lg max-w-none">
-            <p className="text-lg leading-relaxed text-(--color-text)">
-              {content.description}
-            </p>
-          </div>
-        </Card>
-
-        {/* Tags Section */}
-        {tags.length > 0 && (
-          <Card className="p-6">
-            <h3 className="section-title mb-4 text-lg text-(--color-primary)">Tags</h3>
+          {/* Sections/Category Pills */}
+          {sections.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
+              {sections.map((section) => (
                 <span
-                  key={tag}
-                  className="rounded-full bg-(--color-bg) px-4 py-1 text-sm text-(--color-secondary)"
+                  key={section}
+                  className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-[#666666]"
                 >
-                  #{tag}
+                  <Tag size={12} />
+                  {section}
                 </span>
               ))}
             </div>
-          </Card>
-        )}
+          )}
+        </header>
 
-        {/* Image Gallery - LinkedIn Style with Fullscreen Support */}
-        {imageFiles.length > 0 && (
-          <div className="space-y-2">
-            {imageFiles.length === 1 ? (
-              <div className="overflow-hidden rounded-xl border border-(--color-border) bg-slate-50 group relative">
-                <img
-                  src={getCloudinaryThumbnail(imageFiles[0].url, 'image', imageFiles[0])}
-                  alt={imageFiles[0].name}
-                  className="w-full max-h-[600px] object-contain cursor-pointer"
-                  onClick={() => openFullscreen(imageFiles[0])}
-                  onError={(e) => {
-                    e.target.onerror = null
-                    e.target.src = imageFiles[0].url
-                  }}
-                />
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                  <button
-                    onClick={() => openFullscreen(imageFiles[0])}
-                    className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                  >
-                    <ZoomIn size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleDownload(imageFiles[0])}
-                    className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                  >
-                    <Download size={20} />
-                  </button>
-                </div>
-                <div className="bg-white/95 backdrop-blur-sm px-4 py-2 border-t border-(--color-border)">
-                  <p className="text-xs text-(--color-muted) truncate">{imageFiles[0].name}</p>
-                </div>
+        {/* Adaptive Grid Layout - 2/3 main + 1/3 sidebar for desktop */}
+        <div className="grid gap-12 lg:grid-cols-3">
+          {/* Main Content Column */}
+          <div className="space-y-8 lg:col-span-2">
+            {/* Description / Lead Paragraph */}
+            {content.description && (
+              <div className="prose prose-lg max-w-none">
+                <p className="font-serif text-xl leading-relaxed text-[#1a1a1a] first-letter:font-bold first-letter:text-2xl">
+                  {content.description}
+                </p>
               </div>
-            ) : imageFiles.length === 2 ? (
-              <div className="grid grid-cols-2 gap-2">
-                {imageFiles.map((file, index) => (
-                  <div key={index} className="overflow-hidden rounded-xl border border-(--color-border) group relative">
-                    <div className="bg-slate-50">
+            )}
+
+            {/* Adaptive Media Grid - LinkedIn/Substack style */}
+            {imageFiles.length > 0 && (
+              <div className="space-y-0">
+                {/* Single Image - Full Width Hero */}
+                {imageFiles.length === 1 && (
+                  <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
+                    <div className="relative overflow-hidden">
                       <img
-                        src={getCloudinaryThumbnail(file.url, 'image', file)}
-                        alt={file.name}
-                        className="w-full h-80 object-cover cursor-pointer"
-                        onClick={() => openFullscreen(file)}
-                        onError={(e) => {
-                          e.target.onerror = null
-                          e.target.src = file.url
-                        }}
+                        src={imageFiles[0].url}
+                        alt={imageFiles[0].name}
+                        className="w-full max-h-150 object-cover group-hover:scale-105 transition-transform duration-300"
+                        onClick={() => openFullscreen(imageFiles[0], 0)}
                       />
-                    </div>
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <button
-                        onClick={() => openFullscreen(file)}
-                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                      >
-                        <ZoomIn size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDownload(file)}
-                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                      >
-                        <Download size={16} />
-                      </button>
-                    </div>
-                    <div className="bg-white px-3 py-2">
-                      <p className="text-xs text-(--color-muted) truncate">{file.name}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : imageFiles.length === 3 ? (
-              <div className="grid grid-cols-2 gap-2">
-                <div className="row-span-2 overflow-hidden rounded-xl border border-(--color-border) group relative">
-                  <div className="bg-slate-50">
-                    <img
-                      src={getCloudinaryThumbnail(imageFiles[0].url, 'image', imageFiles[0])}
-                      alt={imageFiles[0].name}
-                      className="w-full h-full object-cover cursor-pointer"
-                      onClick={() => openFullscreen(imageFiles[0])}
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = imageFiles[0].url
-                      }}
-                    />
-                  </div>
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                    <button
-                      onClick={() => openFullscreen(imageFiles[0])}
-                      className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                    >
-                      <ZoomIn size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDownload(imageFiles[0])}
-                      className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                    >
-                      <Download size={16} />
-                    </button>
-                  </div>
-                  <div className="bg-white px-3 py-2">
-                    <p className="text-xs text-(--color-muted) truncate">{imageFiles[0].name}</p>
-                  </div>
-                </div>
-                {imageFiles.slice(1).map((file, index) => (
-                  <div key={index} className="overflow-hidden rounded-xl border border-(--color-border) group relative">
-                    <div className="bg-slate-50">
-                      <img
-                        src={getCloudinaryThumbnail(file.url, 'image', file)}
-                        alt={file.name}
-                        className="w-full h-40 object-cover cursor-pointer"
-                        onClick={() => openFullscreen(file)}
-                        onError={(e) => {
-                          e.target.onerror = null
-                          e.target.src = file.url
-                        }}
-                      />
-                    </div>
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <button
-                        onClick={() => openFullscreen(file)}
-                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                      >
-                        <ZoomIn size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDownload(file)}
-                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                      >
-                        <Download size={16} />
-                      </button>
-                    </div>
-                    <div className="bg-white px-3 py-2">
-                      <p className="text-xs text-(--color-muted) truncate">{file.name}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2">
-                {imageFiles.slice(0, 4).map((file, index) => (
-                  <div 
-                    key={index} 
-                    className="relative overflow-hidden rounded-xl border border-(--color-border) group"
-                  >
-                    <div className="bg-slate-50">
-                      <img
-                        src={getCloudinaryThumbnail(file.url, 'image', file)}
-                        alt={file.name}
-                        className="w-full h-64 object-cover cursor-pointer"
-                        onClick={() => openFullscreen(file)}
-                        onError={(e) => {
-                          e.target.onerror = null
-                          e.target.src = file.url
-                        }}
-                      />
-                    </div>
-                    {index === 3 && imageFiles.length > 4 && (
-                      <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                        <span className="text-white text-3xl font-bold">+{imageFiles.length - 4}</span>
+                      {/* Glassmorphism Overlay - Hidden by default, shown on hover */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            openFullscreen(imageFiles[0], 0)
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/90 backdrop-blur text-[#1a1a1a] font-semibold hover:bg-white transition-colors shadow-lg"
+                        >
+                          <ZoomIn size={18} />
+                          Zoom
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDownload(imageFiles[0])
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/90 backdrop-blur text-[#1a1a1a] font-semibold hover:bg-white transition-colors shadow-lg"
+                        >
+                          <Download size={18} />
+                          Save
+                        </button>
                       </div>
-                    )}
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                      <button
-                        onClick={() => openFullscreen(file)}
-                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm px-4 py-3 border-t border-gray-200">
+                      <p className="text-sm text-[#666666] font-medium truncate">{imageFiles[0].name}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2 Images - Split Grid */}
+                {imageFiles.length === 2 && (
+                  <div className="grid grid-cols-2 gap-0">
+                    {imageFiles.map((file, i) => (
+                      <div
+                        key={i}
+                        className="group relative overflow-hidden bg-gray-50 border border-gray-200 border-l-0 border-t-0"
+                        style={{
+                          borderLeft: i % 2 === 0 ? undefined : '1px solid #e5e7eb',
+                          borderTop: i < 2 ? undefined : '1px solid #e5e7eb',
+                        }}
                       >
-                        <ZoomIn size={16} />
+                        <div className="relative overflow-hidden pb-[100%]">
+                          <img
+                            src={file.url}
+                            alt={file.name}
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                            onClick={() => openFullscreen(file, i)}
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                openFullscreen(file, i)
+                              }}
+                              className="p-2 rounded-full bg-white/90 backdrop-blur text-[#1a1a1a] hover:bg-white transition-colors shadow-lg"
+                            >
+                              <ZoomIn size={16} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDownload(file)
+                              }}
+                              className="p-2 rounded-full bg-white/90 backdrop-blur text-[#1a1a1a] hover:bg-white transition-colors shadow-lg"
+                            >
+                              <Download size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 3-4+ Images - Masonry/Grid */}
+                {imageFiles.length >= 3 && (
+                  <div className="grid grid-cols-2 gap-0">
+                    {imageFiles.map((file, i) => (
+                      <div
+                        key={i}
+                        className="group relative overflow-hidden bg-gray-50 border border-gray-200 border-l-0 border-t-0"
+                        style={{
+                          borderLeft: i % 2 === 0 ? undefined : '1px solid #e5e7eb',
+                          borderTop: i < 2 ? undefined : '1px solid #e5e7eb',
+                          gridColumn: i === 0 && imageFiles.length >= 3 ? 'span 1' : undefined,
+                          gridRow: i === 0 && imageFiles.length >= 3 ? 'span 2' : undefined,
+                        }}
+                      >
+                        <div className="relative overflow-hidden pb-[100%] h-full">
+                          <img
+                            src={file.url}
+                            alt={file.name}
+                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                            onClick={() => openFullscreen(file, i)}
+                          />
+                          {/* +N indicator for overflow images */}
+                          {i === 3 && imageFiles.length > 4 && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                              <span className="text-white text-3xl font-bold">+{imageFiles.length - 4}</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                openFullscreen(file, i)
+                              }}
+                              className="p-2 rounded-full bg-white/90 backdrop-blur text-[#1a1a1a] hover:bg-white transition-colors shadow-lg"
+                            >
+                              <ZoomIn size={16} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDownload(file)
+                              }}
+                              className="p-2 rounded-full bg-white/90 backdrop-blur text-[#1a1a1a] hover:bg-white transition-colors shadow-lg"
+                            >
+                              <Download size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* PDF/Document File Cards - File Card Layout */}
+            {pdfFiles.length > 0 && (
+              <div className="space-y-4">
+                {pdfFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="group flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg hover:border-red-300 transition-all"
+                  >
+                    {/* File Icon - Left */}
+                    <div className="shrink-0 flex h-16 w-16 items-center justify-center rounded-lg bg-red-50 group-hover:bg-red-100 transition-colors">
+                      <FileText className="h-8 w-8 text-red-500" strokeWidth={1.5} />
+                    </div>
+
+                    {/* File Info - Center */}
+                    <div className="grow min-w-0">
+                      <h4 className="text-sm font-bold text-[#1a1a1a] truncate">{file.name}</h4>
+                      <p className="text-xs text-[#666666] space-x-2">
+                        <span>PDF Document</span>
+                        {file.size && <span>• {(file.size / 1024 / 1024).toFixed(2)} MB</span>}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons - Right */}
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        onClick={() => window.open(file.url, '_blank')}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-red-600 hover:shadow-lg"
+                      >
+                        <ExternalLink size={14} />
+                        <span className="hidden sm:inline">Open</span>
                       </button>
                       <button
                         onClick={() => handleDownload(file)}
-                        className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-red-500 px-3 py-2 text-xs font-bold text-red-500 transition-all hover:bg-red-50"
                       >
-                        <Download size={16} />
+                        <Download size={14} />
+                        <span className="hidden sm:inline">Save</span>
                       </button>
-                    </div>
-                    <div className="bg-white px-3 py-2">
-                      <p className="text-xs text-(--color-muted) truncate">{file.name}</p>
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        )}
 
-        {/* PDF Previews - Enhanced with Icon Display */}
-        {pdfFiles.length > 0 && (
-          <div className="space-y-4">
-            {pdfFiles.map((file, index) => {
-              return (
-                <Card key={index} className="p-0 overflow-hidden group">
-                  {/* PDF Icon Display */}
-                  <div className="relative bg-gradient-to-br from-red-50 to-orange-50 cursor-pointer" onClick={() => window.open(file.url, '_blank')}>
-                    <div className="w-full h-96 flex items-center justify-center">
-                      <div className="flex h-32 w-32 items-center justify-center rounded-3xl bg-red-500 text-white shadow-2xl group-hover:scale-110 transition-transform">
-                        <FileText size={64} strokeWidth={2} />
-                      </div>
-                    </div>
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center">
-                      <div className="bg-white rounded-full p-4 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                        <ExternalLink size={32} className="text-red-500" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* PDF Info Footer */}
-                  <div className="bg-white border-t border-(--color-border) p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0 pr-4">
-                        <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
-                        <p className="text-xs text-(--color-muted)">PDF Document {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
-                      </div>
-                      <div className="flex gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => window.open(file.url, '_blank')}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-red-600 hover:shadow-lg"
-                        >
-                          <ExternalLink size={14} />
-                          Open
-                        </button>
-                        <button
-                          onClick={() => handleDownload(file)}
-                          className="inline-flex items-center gap-1.5 rounded-lg border-2 border-red-500 px-3 py-2 text-xs font-bold text-red-500 transition-all hover:bg-red-50"
-                        >
-                          <Download size={14} />
-                          Save
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
-        )}
+          {/* Sidebar - Secondary Metadata & Catalog (Sticky) */}
+          <aside className="space-y-6 lg:col-span-1">
+            {/* Sticky Container */}
+            <div className="sticky top-8 space-y-6">
+              {/* Category/Format Card */}
+              {content.format && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666] mb-3">Format</h3>
+                  <p className="text-lg font-semibold text-[#1a1a1a]">{content.format}</p>
+                </div>
+              )}
 
-        {/* Video Players */}
-        {videoFiles.length > 0 && (
-          <div className="space-y-4">
-            {videoFiles.map((file, index) => (
-              <Card key={index} className="p-0 overflow-hidden">
-                <video
-                  controls
-                  className="w-full max-h-[600px] bg-black"
-                  preload="metadata"
-                >
-                  <source src={file.url} type={file.type || 'video/mp4'} />
-                  Your browser does not support the video tag.
-                </video>
-                <div className="bg-white border-t border-(--color-border) px-4 py-2">
-                  <p className="text-sm text-(--color-primary) truncate">{file.name}</p>
-                  <p className="text-xs text-(--color-muted)">Video {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
+              {/* Visibility Card */}
+              {content.visibility && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    {content.visibility === 'public' ? (
+                      <Globe size={16} className="text-[#666666]" />
+                    ) : (
+                      <Lock size={16} className="text-[#666666]" />
+                    )}
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Access</h3>
+                  </div>
+                  <p className="text-sm font-semibold text-[#1a1a1a] capitalize">{content.visibility}</p>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              )}
 
-        {/* Excel Files */}
-        {excelFiles.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="section-title text-lg text-(--color-primary)">Spreadsheets</h3>
-            {excelFiles.map((file, index) => (
-              <Card
-                key={index}
-                className="p-0 overflow-hidden group hover:shadow-lg transition-all"
-              >
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 flex items-center justify-center min-h-[200px] relative">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-green-600 text-white shadow-xl group-hover:scale-110 transition-transform">
-                    <File size={40} strokeWidth={2} />
+              {/* Event Date Card */}
+              {content.eventDate && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Calendar size={16} className="text-[#666666]" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Event Date</h3>
                   </div>
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                  <p className="text-sm font-semibold text-[#1a1a1a]">{formatDate(content.eventDate)}</p>
+                  {content.eventTime && (content.eventTime.start || content.eventTime.end) && (
+                    <p className="text-xs text-[#666666] mt-2">
+                      {content.eventTime.start && content.eventTime.start}
+                      {content.eventTime.start && content.eventTime.end && ' - '}
+                      {content.eventTime.end && content.eventTime.end}
+                    </p>
+                  )}
                 </div>
-                <div className="bg-white border-t border-(--color-border) p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0 pr-4">
-                      <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
-                      <p className="text-xs text-(--color-muted)">Excel Spreadsheet {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => window.open(file.url, '_blank')}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-green-700"
-                      >
-                        <ExternalLink size={14} />
-                        Open
-                      </button>
-                      <button
-                        onClick={() => handleDownload(file)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-green-600 px-3 py-2 text-xs font-bold text-green-600 transition-all hover:bg-green-50"
-                      >
-                        <Download size={14} />
-                        Download
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              )}
 
-        {/* Word Documents */}
-        {wordFiles.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="section-title text-lg text-(--color-primary)">Word Documents</h3>
-            {wordFiles.map((file, index) => (
-              <Card
-                key={index}
-                className="p-0 overflow-hidden group hover:shadow-lg transition-all"
-              >
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 flex items-center justify-center min-h-[200px] relative">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-xl group-hover:scale-110 transition-transform">
-                    <FileText size={40} strokeWidth={2} />
+              {/* Location Card */}
+              {content.location && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[#666666]">📍</span>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Location</h3>
                   </div>
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                  <p className="text-sm font-semibold text-[#1a1a1a]">{content.location}</p>
                 </div>
-                <div className="bg-white border-t border-(--color-border) p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0 pr-4">
-                      <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
-                      <p className="text-xs text-(--color-muted)">Word Document {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => window.open(file.url, '_blank')}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-blue-700"
-                      >
-                        <ExternalLink size={14} />
-                        Open
-                      </button>
-                      <button
-                        onClick={() => handleDownload(file)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-blue-600 px-3 py-2 text-xs font-bold text-blue-600 transition-all hover:bg-blue-50"
-                      >
-                        <Download size={14} />
-                        Download
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              )}
 
-        {/* Other Documents */}
-        {documentFiles.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="section-title text-lg text-(--color-primary)">Other Files</h3>
-            {documentFiles.map((file, index) => (
-              <Card
-                key={index}
-                className="p-0 overflow-hidden group hover:shadow-lg transition-all"
-              >
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-8 flex items-center justify-center min-h-[200px] relative">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-purple-500 text-white shadow-xl group-hover:scale-110 transition-transform">
-                    {getFileIcon('document')}
+              {/* Speaker Card */}
+              {content.speaker && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <User size={16} className="text-[#666666]" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Speaker/Author</h3>
                   </div>
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity" />
+                  <p className="text-sm font-semibold text-[#1a1a1a]">{content.speaker}</p>
                 </div>
-                <div className="bg-white border-t border-(--color-border) p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0 pr-4">
-                      <p className="text-sm font-medium text-(--color-primary) truncate">{file.name}</p>
-                      <p className="text-xs text-(--color-muted)">{file.type || 'Document'} {file.size ? `• ${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}</p>
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => window.open(file.url, '_blank')}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-purple-700"
-                      >
-                        <ExternalLink size={14} />
-                        Open
-                      </button>
-                      <button
-                        onClick={() => handleDownload(file)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-purple-600 px-3 py-2 text-xs font-bold text-purple-600 transition-all hover:bg-purple-50"
-                      >
-                        <Download size={14} />
-                        Download
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              )}
 
-        {/* Metadata Footer */}
-        <Card className="p-6">
-          <h3 className="section-title mb-4 text-sm text-(--color-muted)">Content Information</h3>
-          <dl className="grid gap-4 text-sm md:grid-cols-2">
-            <div>
-              <dt className="font-bold text-(--color-secondary)">Visibility</dt>
-              <dd className="text-(--color-muted)">{content.visibility}</dd>
+              {/* External URL Card */}
+              {content.externalUrl && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-3">
+                    <ExternalLink size={16} className="text-[#666666]" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">External Link</h3>
+                  </div>
+                  <a 
+                    href={content.externalUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline break-all"
+                  >
+                    Visit Resource →
+                  </a>
+                </div>
+              )}
+
+              {/* Featured Badge */}
+              {content.featured && (
+                <div className="rounded-lg border-2 border-amber-300 bg-linear-to-br from-amber-50 to-amber-100 p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-xl">⭐</span>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800">Featured Content</h3>
+                  </div>
+                  <p className="text-xs text-amber-700">This content is featured on the homepage</p>
+                </div>
+              )}
+
+              {/* Tags/Categories Sidebar */}
+              {tags.length > 0 && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666] mb-4">Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-[#666666]"
+                      >
+                        <Tag size={12} />
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Status Card */}
+              {content.status && (
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666] mb-3">Status</h3>
+                  <Badge className="capitalize">{content.status}</Badge>
+                </div>
+              )}
             </div>
-            <div>
-              <dt className="font-bold text-(--color-secondary)">Status</dt>
-              <dd className="text-(--color-muted)">{content.status}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-(--color-secondary)">Format</dt>
-              <dd className="text-(--color-muted)">{content.format}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-(--color-secondary)">Published</dt>
-              <dd className="text-(--color-muted)">{formatDate(content.createdAt)}</dd>
-            </div>
-          </dl>
-        </Card>
-      </article>
-
-      {/* Bottom Navigation */}
-      <div className="flex justify-center pt-8">
-        <Button onClick={() => navigate(-1)} className="w-full md:w-auto">
-          Back to List
-        </Button>
+          </aside>
+        </div>
       </div>
     </div>
   )

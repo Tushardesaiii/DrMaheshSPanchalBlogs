@@ -26,6 +26,16 @@ const contentSchema = new mongoose.Schema(
     status: { type: String, enum: ["Draft", "Scheduled", "Published"], default: "Draft" },
     author: { type: String, default: "Admin" },
     tags: [String],
+    // New fields for enhanced content management
+    eventDate: { type: Date }, // Date for events, workshops, conferences
+    location: { type: String, trim: true }, // Location for events (optional)
+    eventTime: { 
+      start: { type: String }, // Start time (e.g., "10:00 AM")
+      end: { type: String }    // End time (e.g., "5:00 PM")
+    },
+    speaker: { type: String, trim: true }, // Speaker or author name for events
+    externalUrl: { type: String, trim: true }, // Link to external resources
+    featured: { type: Boolean, default: false }, // Mark as featured content
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

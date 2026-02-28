@@ -1,12 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutGrid, BookMarked, FileText, CalendarCheck, Tags } from 'lucide-react'
+import { LayoutGrid, BookMarked, Image, FileText } from 'lucide-react'
 
 const adminLinks = [
   { label: 'Dashboard', to: '/admin', icon: LayoutGrid },
   { label: 'Manage Books', to: '/admin/books', icon: BookMarked },
-  { label: 'Manage Articles', to: '/admin/articles', icon: FileText },
-  { label: 'Manage Events', to: '/admin/events', icon: CalendarCheck },
-  { label: 'Manage Categories', to: '/admin/categories', icon: Tags },
+  { label: 'Photos', to: '/admin/photos', icon: Image },
+  { label: 'Manage PDFs', to: '/admin/pdfs', icon: FileText },
 ]
 
 function Sidebar() {

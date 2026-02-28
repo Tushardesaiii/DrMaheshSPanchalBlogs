@@ -10,7 +10,22 @@ const createContent = asyncHandler(async (req, res) => {
   console.log("Files received:", req.files ? req.files.length : 0);
   console.log("User:", req.user?._id);
   
-  const { title, description, format, sections, visibility, status, tags } = req.body;
+  const { 
+    title, 
+    description, 
+    format, 
+    sections, 
+    visibility, 
+    status, 
+    tags,
+    eventDate,
+    location,
+    eventTimeStart,
+    eventTimeEnd,
+    speaker,
+    externalUrl,
+    featured
+  } = req.body;
 
   if (!title || !description) {
     console.error("Missing required fields: title or description");
@@ -96,6 +111,12 @@ const createContent = asyncHandler(async (req, res) => {
 
   console.log("Creating content with files:", files.length);
 
+  // Prepare event time object if provided
+  const eventTime = (eventTimeStart || eventTimeEnd) ? {
+    start: eventTimeStart,
+    end: eventTimeEnd
+  } : undefined;
+
   const content = await Content.create({
     title: title.trim(),
     description: description.trim(),
@@ -107,6 +128,13 @@ const createContent = asyncHandler(async (req, res) => {
     tags: parsedTags,
     author: req.user?.name || "Admin",
     createdBy: req.user?._id,
+    // New fields
+    ...(eventDate && { eventDate: new Date(eventDate) }),
+    ...(location && { location: location.trim() }),
+    ...(eventTime && { eventTime }),
+    ...(speaker && { speaker: speaker.trim() }),
+    ...(externalUrl && { externalUrl: externalUrl.trim() }),
+    ...(featured !== undefined && { featured: featured === 'true' || featured === true }),
   });
 
   console.log("Content created successfully:", content._id);
@@ -157,7 +185,22 @@ const getContentBySection = asyncHandler(async (req, res) => {
 
 const updateContent = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description, format, sections, visibility, status, tags } = req.body;
+  const { 
+    title, 
+    description, 
+    format, 
+    sections, 
+    visibility, 
+    status, 
+    tags,
+    eventDate,
+    location,
+    eventTimeStart,
+    eventTimeEnd,
+    speaker,
+    externalUrl,
+    featured
+  } = req.body;
 
   let files = undefined;
 
@@ -193,6 +236,12 @@ const updateContent = asyncHandler(async (req, res) => {
     }
   }
 
+  // Prepare event time object if provided
+  const eventTime = (eventTimeStart || eventTimeEnd) ? {
+    start: eventTimeStart,
+    end: eventTimeEnd
+  } : undefined;
+
   const content = await Content.findByIdAndUpdate(
     id,
     {
@@ -204,6 +253,13 @@ const updateContent = asyncHandler(async (req, res) => {
       ...(status && { status }),
       ...(files !== undefined && { files }),
       ...(tags && { tags: JSON.parse(tags) }),
+      // New fields
+      ...(eventDate && { eventDate: new Date(eventDate) }),
+      ...(location !== undefined && { location: location ? location.trim() : null }),
+      ...(eventTime && { eventTime }),
+      ...(speaker !== undefined && { speaker: speaker ? speaker.trim() : null }),
+      ...(externalUrl !== undefined && { externalUrl: externalUrl ? externalUrl.trim() : null }),
+      ...(featured !== undefined && { featured: featured === 'true' || featured === true }),
     },
     { new: true }
   );

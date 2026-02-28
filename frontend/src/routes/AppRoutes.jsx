@@ -25,9 +25,8 @@ import ActivityPage from '../pages/ActivityPage'
 // Admin Pages
 import Dashboard from '../admin/Dashboard'
 import AdminBooks from '../admin/Books'
-import AdminArticles from '../admin/Articles'
-import AdminEvents from '../admin/Events'
-import AdminCategories from '../admin/Categories'
+import AdminPhotos from '../admin/Photos'
+import AdminPDFs from '../admin/PDFs'
 
 /**
  * AppRoutes Component
@@ -81,9 +80,8 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="books" element={<AdminBooks />} />
-          <Route path="articles" element={<AdminArticles />} />
-          <Route path="events" element={<AdminEvents />} />
-          <Route path="categories" element={<AdminCategories />} />
+          <Route path="photos" element={<AdminPhotos />} />
+          <Route path="pdfs" element={<AdminPDFs />} />
         </Route>
       </Route>
 

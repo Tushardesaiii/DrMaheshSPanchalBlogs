@@ -1,5 +1,5 @@
 function Card({ className = '', children }) {
-  return <div className={`paper-panel p-6 ${className}`}>{children}</div>
+  return <div className={`premium-card ${className}`}>{children}</div>
 }
 
 export default Card

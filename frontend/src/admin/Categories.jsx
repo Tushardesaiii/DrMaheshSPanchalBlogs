@@ -16,7 +16,7 @@ const sectionRows = [
 function Categories() {
   return (
     <div className="space-y-8">
-      <Card className="admin-panel">
+      <Card className="admin-panel p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="admin-kicker">Homepage Sections</p>
@@ -40,7 +40,7 @@ function Categories() {
           </div>
         </div>
       </Card>
-      <Card className="admin-panel">
+      <Card className="admin-panel p-8">
         <div className="flex items-center justify-between">
           <h3 className="admin-title text-lg">Section Map</h3>
           <span className="admin-chip">Homepage</span>

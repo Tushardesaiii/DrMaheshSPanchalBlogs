@@ -19,6 +19,11 @@ const getCloudinaryThumbnail = (url, fileType) => {
     return url
   }
 
+  const isSignedUrl = /\/s--[^/]+--\//.test(url)
+  if (isSignedUrl) {
+    return url
+  }
+
   if (fileType === 'pdf') {
     return url.replace('/upload/', '/upload/w_800,h_600,c_fit,f_jpg,pg_1/')
   }

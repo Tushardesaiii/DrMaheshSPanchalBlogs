@@ -9,14 +9,19 @@
 	box-sizing: border-box;
 }
 
+html {
+	scroll-behavior: smooth;
+}
+
 body {
 	margin: 0;
 	font-family: var(--font-body);
 	color: var(--color-text);
 	background: var(--color-bg);
-	line-height: 1.6;
+	line-height: 1.7;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	letter-spacing: -0.3px;
 }
 
 a {
@@ -27,4 +32,70 @@ a {
 img {
 	max-width: 100%;
 	display: block;
+	height: auto;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-accent);
+	border-radius: 10px;
+	transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-accent-dark);
+}
+
+/* Selection Styling */
+::selection {
+	background-color: var(--color-accent);
+	color: white;
+}
+
+::-moz-selection {
+	background-color: var(--color-accent);
+	color: white;
+}
+
+/* Custom Focus Styles */
+:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+/* Link Hover States */
+a:not([class]) {
+	color: var(--color-accent);
+	transition: color 0.3s ease;
+}
+
+a:not([class]):hover {
+	color: var(--color-accent-dark);
+}
+
+/* Button Reset */
+button {
+	font-family: inherit;
+}
+
+/* Input Focus States */
+input:focus,
+textarea:focus,
+select:focus {
+	outline: none;
+	box-shadow: var(--shadow-focus);
+}
+
+/* Smooth Transitions */
+* {
+	transition: color 0.3s ease, border-color 0.3s ease;
 }
