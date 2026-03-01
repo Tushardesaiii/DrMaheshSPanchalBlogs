@@ -14,7 +14,7 @@ const NAV_GROUPS = [
   },
   {
     title: "Digital Library",
-    links: ["Books", "PDFs", "Articles", "Notes", "Tags & Filters"]
+    links: ["Books", "PDFs", "Articles", "Notes"]
   },
   {
     title: "Collaboration",

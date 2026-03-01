@@ -5,11 +5,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createContent = asyncHandler(async (req, res) => {
-  console.log("\n=== CREATE CONTENT REQUEST ===");
-  console.log("Body:", req.body);
-  console.log("Files received:", req.files ? req.files.length : 0);
-  console.log("User:", req.user?._id);
-  
   const { 
     title, 
     description, 
@@ -67,16 +62,10 @@ const createContent = asyncHandler(async (req, res) => {
     parsedTags = [];
   }
 
-  console.log("Parsed sections:", parsedSections);
-  console.log("Parsed tags:", parsedTags);
-
   let files = [];
 
   if (req.files && req.files.length > 0) {
-    console.log("Processing", req.files.length, "files...");
     for (const file of req.files) {
-      console.log("Uploading to Cloudinary:", file.originalname, "MIME type:", file.mimetype);
-      
       // Pass file metadata to the upload function
       const cloudinaryResponse = await uploadOnCloudinary(
         file.path,
@@ -90,8 +79,6 @@ const createContent = asyncHandler(async (req, res) => {
       );
 
       if (cloudinaryResponse) {
-        console.log("Cloudinary upload success:", cloudinaryResponse.url);
-        console.log("Resource type:", cloudinaryResponse.resourceType);
         files.push({
           name: cloudinaryResponse.originalFilename,
           type: cloudinaryResponse.mimeType,
@@ -108,8 +95,6 @@ const createContent = asyncHandler(async (req, res) => {
       }
     }
   }
-
-  console.log("Creating content with files:", files.length);
 
   // Prepare event time object if provided
   const eventTime = (eventTimeStart || eventTimeEnd) ? {
@@ -136,9 +121,6 @@ const createContent = asyncHandler(async (req, res) => {
     ...(externalUrl && { externalUrl: externalUrl.trim() }),
     ...(featured !== undefined && { featured: featured === 'true' || featured === true }),
   });
-
-  console.log("Content created successfully:", content._id);
-  console.log("=== END CREATE CONTENT ===");
 
   return res.status(201).json(
     new ApiResponse(201, content, "Content created successfully")
@@ -207,8 +189,6 @@ const updateContent = asyncHandler(async (req, res) => {
   if (req.files && req.files.length > 0) {
     files = [];
     for (const file of req.files) {
-      console.log("Uploading to Cloudinary:", file.originalname, "MIME type:", file.mimetype);
-      
       const cloudinaryResponse = await uploadOnCloudinary(
         file.path,
         {

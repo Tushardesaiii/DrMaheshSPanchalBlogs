@@ -12,15 +12,6 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-// Logging middleware for content routes
-router.use((req, res, next) => {
-  if (req.method === 'POST' || req.method === 'PUT') {
-    console.log(`\n📨 ${req.method} ${req.path}`);
-    console.log('Headers:', req.headers);
-  }
-  next();
-});
-
 router.get("/", getAllContent);
 router.get("/section/:section", getContentBySection);
 router.get("/:id", getContentById);

@@ -9,8 +9,8 @@ const COOKIE_MAX_AGE_DAYS = Number(process.env.ACCESS_TOKEN_MAX_AGE_DAYS || 7);
 
 const buildCookieOptions = () => ({
   httpOnly: true,
-  secure: false,
-  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
 });
 

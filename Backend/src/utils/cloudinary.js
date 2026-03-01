@@ -61,9 +61,6 @@ const uploadOnCloudinary = async (localFilePath, fileMetadata = {}, options = {}
 
     // Determine the correct resource type
     const resourceType = getResourceType(localFilePath, fileMetadata.mimetype);
-    
-    console.log(`Uploading file: ${fileMetadata.originalname || localFilePath}`);
-    console.log(`Detected resource type: ${resourceType}`);
 
     // Upload to Cloudinary with appropriate settings
     // CRITICAL: Ensure public delivery by avoiding access_mode and using type: upload
@@ -92,8 +89,6 @@ const uploadOnCloudinary = async (localFilePath, fileMetadata = {}, options = {}
     // Generate SIGNED URL for untrusted accounts
     // Regular secure_url won't work if account is marked as untrusted
     const signedUrl = getOptimizedUrl(response.public_id, response.resource_type);
-    
-    console.log(`Generated signed URL (expires in 30 days): ${signedUrl ? 'YES' : 'FAILED'}`);
     
     // Return enhanced response with SIGNED URL
     return {
