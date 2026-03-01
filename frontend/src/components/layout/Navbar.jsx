@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { Search, Plus, ArrowRight } from "lucide-react";
+import { Search, Plus, ArrowRight, X } from "lucide-react";
+import { useState, useMemo } from "react";
+import { useContent } from "../../context/ContentContext";
 
 const NAV_GROUPS = [
   {
@@ -21,6 +23,24 @@ const NAV_GROUPS = [
 ];
 
 export default function Navbar() {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { normalizedContents } = useContent();
+
+  // Search functionality - search across title, description, and sections
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return []
+    
+    const query = searchQuery.toLowerCase()
+    return normalizedContents.filter((item) => {
+      const title = item.title?.toLowerCase() || ''
+      const description = item.description?.toLowerCase() || ''
+      const sections = (item.sections || []).map((s) => s.toLowerCase()).join(' ')
+      
+      return title.includes(query) || description.includes(query) || sections.includes(query)
+    })
+  }, [searchQuery, normalizedContents])
+
   const slugify = (text) =>
     text.toLowerCase().replace(/\s+/g, "-").replace(/[&]/g, "and");
 
@@ -56,7 +76,10 @@ export default function Navbar() {
             View All Blogs
           </NavLink>
 
-          <button className="flex items-center gap-4 bg-[#B89B5E] text-[#1F3A33] px-6 py-3 font-semibold uppercase tracking-widest hover:brightness-110 transition">
+          <button 
+            onClick={() => setSearchOpen(true)}
+            className="flex items-center gap-4 bg-[#B89B5E] text-[#1F3A33] px-6 py-3 font-semibold uppercase tracking-widest hover:brightness-110 transition"
+          >
             <Search size={20} strokeWidth={2} />
             Search
           </button>
@@ -107,6 +130,82 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Search Modal */}
+      {searchOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 pt-20 px-4"
+          onClick={() => setSearchOpen(false)}
+        >
+          <div 
+            className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Input */}
+            <div className="flex items-center border-b border-gray-200 p-6">
+              <Search className="text-gray-400" size={24} />
+              <input
+                type="text"
+                placeholder="Search all content..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+                className="flex-1 ml-4 text-lg outline-none placeholder:text-gray-400"
+              />
+              <button
+                onClick={() => setSearchOpen(false)}
+                className="ml-4 p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            {/* Search Results */}
+            <div className="max-h-96 overflow-y-auto p-4">
+              {searchQuery.trim() ? (
+                searchResults.length > 0 ? (
+                  <div className="space-y-2">
+                    {searchResults.slice(0, 8).map((result) => (
+                      <NavLink
+                        key={result.id}
+                        to={`/content/${result.id}`}
+                        onClick={() => {
+                          setSearchOpen(false)
+                          setSearchQuery('')
+                        }}
+                        className="block p-4 rounded-lg hover:bg-gray-50 transition-colors border-l-4 border-transparent hover:border-[#B89B5E]"
+                      >
+                        <div className="font-semibold text-[#1F3A33] line-clamp-1">{result.title}</div>
+                        <div className="text-sm text-gray-600 mt-1 line-clamp-1">{result.description}</div>
+                        <div className="flex gap-2 mt-2 flex-wrap">
+                          {result.sections?.slice(0, 2).map((section, idx) => (
+                            <span key={idx} className="inline-block text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                              {section}
+                            </span>
+                          ))}
+                        </div>
+                      </NavLink>
+                    ))}
+                    {searchResults.length > 8 && (
+                      <div className="text-center py-3 text-sm text-gray-500 border-t">
+                        +{searchResults.length - 8} more results
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="py-12 text-center text-gray-500">
+                    No results found for "{searchQuery}"
+                  </div>
+                )
+              ) : (
+                <div className="py-12 text-center text-gray-400">
+                  Start typing to search all content...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

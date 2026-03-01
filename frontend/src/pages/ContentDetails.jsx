@@ -139,8 +139,7 @@ function ContentDetails() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-[#fcfcf9] to-[#f5f3f0]">
-      {/* Fullscreen Image Modal - LinkedIn/Substack style */}
-      {fullscreenImage && (
+         {fullscreenImage && (
         <div 
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={closeFullscreen}
@@ -160,23 +159,24 @@ function ContentDetails() {
         </div>
       )}
 
-      <div className="mx-auto max-w-3xl px-6 py-12 md:py-16">{/*Main content width*/}
+      <div className="mx-auto  px-6 py-12 md:py-7">{/*Main content width*/}
 
 
         {/* Breadcrumb & Back Navigation */}
         <button
           onClick={() => navigate(-1)}
-          className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#666666] hover:text-[#1a1a1a] transition-all mb-8 hover:-translate-x-1"
+          className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#666666] hover:text-[#1a1a1a] transition-all mb-7 hover:-translate-x-1"
         >
           <ChevronLeft size={16} className="transition-transform group-hover:-translate-x-1" />
           Back
         </button>
 
         {/* Article Header - LinkedIn/Substack Style */}
-        <header className="mb-12 border-b border-gray-200 pb-8 space-y-6">
+        <header className="mb-12 border-b border-gray-200 pb-1 space-y-6">
           {/* Title */}
           <h1 className="font-serif text-5xl leading-tight tracking-tight text-[#1a1a1a] md:text-6xl wrap-break-word">
             {content.title}
+            
           </h1>
 
           {/* Metadata Bar - Author, Date, Status */}
@@ -227,16 +227,8 @@ function ContentDetails() {
           <div className="space-y-12 lg:col-span-2">
             {/* Description / Lead Paragraph */}
             {content.description && (
-              <div className="bg-white rounded-2xl border-2 border-(--color-border) shadow-sm hover:shadow-md transition-shadow p-8 lg:p-12">
-                <div className="flex items-center gap-3 mb-10 pb-8 border-b-2 border-(--color-border)">
-                  <div className="p-2 rounded-lg bg-(--color-accent)/10">
-                    <FileText size={26} className="text-(--color-accent)" />
-                  </div>
-                  <div>
-                    <h3 className="section-title text-2xl lg:text-3xl font-semibold text-(--color-primary)">Content Overview</h3>
-                    <p className="text-xs text-(--color-muted) mt-1">Full article text and description</p>
-                  </div>
-                </div>
+              <div className="bg-white rounded-2xl border-2 border-[#B89B5E] shadow-sm hover:shadow-md transition-shadow p-6 lg:p-12">
+                
                 <div className="prose prose-lg max-w-none space-y-8">
                   <p 
                     className="font-serif text-lg lg:text-xl leading-8 text-[#2a2a2a] tracking-wide" 
