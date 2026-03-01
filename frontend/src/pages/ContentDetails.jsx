@@ -138,7 +138,7 @@ function ContentDetails() {
   const documentFiles = files.filter(f => !['image', 'pdf', 'video'].includes(getFileType(f)))
 
   return (
-    <div className="min-h-screen bg-[#fcfcf9]">
+    <div className="min-h-screen bg-linear-to-br from-[#fcfcf9] to-[#f5f3f0]">
       {/* Fullscreen Image Modal - LinkedIn/Substack style */}
       {fullscreenImage && (
         <div 
@@ -222,19 +222,24 @@ function ContentDetails() {
         </header>
 
         {/* Adaptive Grid Layout - 2/3 main + 1/3 sidebar for desktop */}
-        <div className="grid gap-12 lg:grid-cols-3">
+        <div className="grid gap-16 lg:grid-cols-3">
           {/* Main Content Column */}
-          <div className="space-y-8 lg:col-span-2">
+          <div className="space-y-12 lg:col-span-2">
             {/* Description / Lead Paragraph */}
             {content.description && (
-              <div className="premium-card border border-(--color-border)">
-                <div className="flex items-center gap-2 mb-6 pb-4 border-b border-(--color-border)">
-                  <FileText size={18} className="text-(--color-accent)" />
-                  <h3 className="section-title text-lg text-(--color-primary)">Content</h3>
+              <div className="bg-white rounded-2xl border-2 border-(--color-border) shadow-sm hover:shadow-md transition-shadow p-8 lg:p-12">
+                <div className="flex items-center gap-3 mb-10 pb-8 border-b-2 border-(--color-border)">
+                  <div className="p-2 rounded-lg bg-(--color-accent)/10">
+                    <FileText size={26} className="text-(--color-accent)" />
+                  </div>
+                  <div>
+                    <h3 className="section-title text-2xl lg:text-3xl font-semibold text-(--color-primary)">Content Overview</h3>
+                    <p className="text-xs text-(--color-muted) mt-1">Full article text and description</p>
+                  </div>
                 </div>
-                <div className="prose prose-lg max-w-none">
+                <div className="prose prose-lg max-w-none space-y-8">
                   <p 
-                    className="font-serif text-lg leading-relaxed text-[#1a1a1a]" 
+                    className="font-serif text-lg lg:text-xl leading-8 text-[#2a2a2a] tracking-wide" 
                     style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
                   >
                     {content.description}
@@ -431,44 +436,45 @@ function ContentDetails() {
           </div>
 
           {/* Sidebar - Secondary Metadata & Catalog (Sticky) */}
-          <aside className="space-y-6 lg:col-span-1">
+          <aside className="space-y-8 lg:col-span-1">
             {/* Sticky Container */}
             <div className="sticky top-8 space-y-6">
               {/* Category/Format Card */}
               {content.format && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666] mb-3">Format</h3>
-                  <p className="text-lg font-semibold text-[#1a1a1a]">{content.format}</p>
+                <div className="rounded-xl border-2 border-(--color-border) bg-white p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted) mb-3">📋 Format</p>
+                  <p className="text-xl font-semibold text-(--color-primary)">{content.format}</p>
                 </div>
               )}
 
               {/* Visibility Card */}
               {content.visibility && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
+                <div className="rounded-xl border-2 border-(--color-border) bg-white p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
                     {content.visibility === 'public' ? (
-                      <Globe size={16} className="text-[#666666]" />
+                      <Globe size={18} className="text-(--color-accent)" />
                     ) : (
-                      <Lock size={16} className="text-[#666666]" />
+                      <Lock size={18} className="text-(--color-accent)" />
                     )}
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Access</h3>
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">Access Level</p>
                   </div>
-                  <p className="text-sm font-semibold text-[#1a1a1a] capitalize">{content.visibility}</p>
+                  <p className="text-xl font-semibold text-(--color-primary) capitalize">{content.visibility}</p>
                 </div>
               )}
 
               {/* Event Date Card */}
               {content.eventDate && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Calendar size={16} className="text-[#666666]" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Event Date</h3>
+                <div className="rounded-xl border-2 border-(--color-border) bg-linear-to-br from-white to-blue-50/30 p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Calendar size={18} className="text-(--color-accent)" />
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">Event Date</p>
                   </div>
-                  <p className="text-sm font-semibold text-[#1a1a1a]">{formatDate(content.eventDate)}</p>
+                  <p className="text-xl font-semibold text-(--color-primary)">{formatDate(content.eventDate)}</p>
                   {content.eventTime && (content.eventTime.start || content.eventTime.end) && (
-                    <p className="text-xs text-[#666666] mt-2">
+                    <p className="text-sm text-(--color-muted) mt-3 leading-relaxed">
+                      <span className="font-medium">Time:&nbsp;</span>
                       {content.eventTime.start && content.eventTime.start}
-                      {content.eventTime.start && content.eventTime.end && ' - '}
+                      {content.eventTime.start && content.eventTime.end && ' – '}
                       {content.eventTime.end && content.eventTime.end}
                     </p>
                   )}
@@ -477,66 +483,67 @@ function ContentDetails() {
 
               {/* Location Card */}
               {content.location && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[#666666]">📍</span>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Location</h3>
+                <div className="rounded-xl border-2 border-(--color-border) bg-linear-to-br from-white to-green-50/30 p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-2xl">📍</span>
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">Location</p>
                   </div>
-                  <p className="text-sm font-semibold text-[#1a1a1a]">{content.location}</p>
+                  <p className="text-xl font-semibold text-(--color-primary)">{content.location}</p>
                 </div>
               )}
 
               {/* Speaker Card */}
               {content.speaker && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
-                    <User size={16} className="text-[#666666]" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">Speaker/Author</h3>
+                <div className="rounded-xl border-2 border-(--color-border) bg-linear-to-br from-white to-purple-50/30 p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <User size={18} className="text-(--color-accent)" />
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">Speaker/Author</p>
                   </div>
-                  <p className="text-sm font-semibold text-[#1a1a1a]">{content.speaker}</p>
+                  <p className="text-xl font-semibold text-(--color-primary)">{content.speaker}</p>
                 </div>
               )}
 
               {/* External URL Card */}
               {content.externalUrl && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center gap-3 mb-3">
-                    <ExternalLink size={16} className="text-[#666666]" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666]">External Link</h3>
+                <div className="rounded-xl border-2 border-(--color-border) bg-linear-to-br from-white to-amber-50/30 p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ExternalLink size={18} className="text-(--color-accent)" />
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">External Resource</p>
                   </div>
                   <a 
                     href={content.externalUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline break-all"
+                    className="text-lg font-semibold text-(--color-accent) hover:text-(--color-primary) hover:underline break-all inline-flex items-center gap-2 group transition-colors"
                   >
-                    Visit Resource →
+                    Visit Resource
+                    <ExternalLink size={14} className="group-hover:translate-x-1 transition-transform" />
                   </a>
                 </div>
               )}
 
               {/* Featured Badge */}
               {content.featured && (
-                <div className="rounded-lg border-2 border-amber-300 bg-linear-to-br from-amber-50 to-amber-100 p-6 shadow-sm">
+                <div className="rounded-xl border-2 border-amber-400 bg-linear-to-br from-amber-50 to-amber-100 p-7 shadow-md">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-xl">⭐</span>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800">Featured Content</h3>
+                    <span className="text-2xl animate-pulse">⭐</span>
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-amber-900">Featured Content</p>
                   </div>
-                  <p className="text-xs text-amber-700">This content is featured on the homepage</p>
+                  <p className="text-sm text-amber-800 mt-2">This content is highlighted on the homepage</p>
                 </div>
               )}
 
               {/* Tags/Categories Sidebar */}
               {tags.length > 0 && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666] mb-4">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
+                <div className="rounded-xl border-2 border-(--color-border) bg-white p-7 shadow-sm hover:shadow-md transition-all">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted) mb-4">🏷️ Tags & Topics</p>
+                  <div className="flex flex-wrap gap-3">
                     {tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-[#666666]"
+                        className="inline-flex items-center gap-2 rounded-full bg-(--color-accent)/10 px-4 py-2 text-sm font-medium text-(--color-accent) hover:bg-(--color-accent)/20 transition-colors cursor-pointer"
                       >
-                        <Tag size={12} />
+                        <Tag size={14} />
                         {tag}
                       </span>
                     ))}
@@ -546,9 +553,9 @@ function ContentDetails() {
 
               {/* Status Card */}
               {content.status && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#666666] mb-3">Status</h3>
-                  <Badge className="capitalize">{content.status}</Badge>
+                <div className="rounded-xl border-2 border-(--color-border) bg-white p-7 shadow-sm hover:shadow-md transition-all">
+                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted) mb-4">📊 Status</p>
+                  <Badge className="capitalize text-base px-4 py-2 font-semibold">{content.status}</Badge>
                 </div>
               )}
             </div>

@@ -548,72 +548,29 @@
 
 .admin-field-label {
   color: #6b6459;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  display: block;
-  margin-bottom: 0.625rem;
-}
-
-.admin-section {
-  background: #fafaf9;
-  border: 1px solid #e7e5e4;
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
-
-.admin-section-title {
-  color: var(--admin-ink);
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--admin-accent);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.admin-form-group {
-  margin-bottom: 2rem;
-}
-
-.admin-helper-text {
-  color: #78716c;
-  font-size: 0.8125rem;
-  margin-top: 0.5rem;
-  line-height: 1.5;
 }
 
 .admin-textarea {
   background: #ffffff;
-  border: 2px solid var(--admin-border);
-  border-radius: 16px;
+  border: 1px solid var(--admin-border);
+  border-radius: 14px;
   color: var(--admin-ink);
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 1.0625rem;
-  padding: 1.5rem 1.75rem;
+  font-family: var(--font-admin-body);
+  font-size: 0.9rem;
+  padding: 0.875rem 0.9rem;
   width: 100%;
-  line-height: 1.9;
-  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.04);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  resize: vertical;
-  min-height: 280px;
-}
-
-.admin-textarea:hover {
-  border-color: rgba(161, 98, 7, 0.3);
-  background: #fefefe;
+  line-height: 1.6;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .admin-textarea:focus {
   outline: none;
   border-color: var(--admin-accent);
-  background: #fffef9;
-  box-shadow: 0 0 0 4px rgba(161, 98, 7, 0.08), inset 0 2px 4px rgba(15, 23, 42, 0.04);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(161, 98, 7, 0.1), inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .admin-pill-group {

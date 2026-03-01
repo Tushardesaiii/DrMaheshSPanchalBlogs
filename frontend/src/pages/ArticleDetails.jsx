@@ -32,7 +32,8 @@ function ArticleDetails() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
+    <div className="bg-[#fcfcf9]">
+      <div className="mx-auto max-w-6xl px-4 py-16">
       {/* Breadcrumb / Back Navigation */}
       <nav className="mb-8">
         <Button variant="ghost" className="group flex items-center gap-2 text-sm text-(--color-muted) hover:text-(--color-primary)">
@@ -41,8 +42,8 @@ function ArticleDetails() {
         </Button>
       </nav>
 
-      <div className="grid gap-16 lg:grid-cols-[2fr_1fr]">
-        <article className="space-y-10">
+      <div className="grid gap-20 lg:grid-cols-[2fr_1fr]">
+        <article className="space-y-14">
           {/* Header Section */}
           <header className="space-y-6 border-b border-(--color-border) pb-10">
             <div className="flex items-center gap-3">
@@ -73,8 +74,8 @@ function ArticleDetails() {
           </header>
 
           {/* Abstract / Summary */}
-          <section className="relative border-l-4 border-(--color-accent) bg-(--color-accent)/5 p-8 italic">
-            <p className="text-lg leading-relaxed text-(--color-primary)/80">
+          <section className="relative border-l-4 border-(--color-accent) bg-linear-to-r from-[#f5f1ed] to-transparent p-8 lg:p-10 rounded-r-2xl italic">
+            <p className="text-lg lg:text-xl leading-8 text-(--color-primary) font-serif">
               {article.summary}
             </p>
           </section>
@@ -124,39 +125,47 @@ function ArticleDetails() {
 
             {/* Info Bar Below Media */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="premium-card p-4 text-center">
-                <p className="text-xs text-(--color-muted) mb-2">Format</p>
-                <p className="font-semibold text-(--color-primary)">PDF</p>
+              <div className="premium-card p-6 text-center rounded-xl border-2 border-(--color-border) hover:shadow-md transition-all">
+                <p className="text-xs text-(--color-muted) mb-3 font-bold uppercase tracking-wider">Format</p>
+                <p className="font-semibold text-(--color-primary) text-lg">PDF</p>
               </div>
-              <div className="premium-card p-4 text-center">
-                <p className="text-xs text-(--color-muted) mb-2">Size</p>
-                <p className="font-semibold text-(--color-primary)">2.4 MB</p>
+              <div className="premium-card p-6 text-center rounded-xl border-2 border-(--color-border) hover:shadow-md transition-all">
+                <p className="text-xs text-(--color-muted) mb-3 font-bold uppercase tracking-wider">Size</p>
+                <p className="font-semibold text-(--color-primary) text-lg">2.4 MB</p>
               </div>
-              <div className="premium-card p-4 text-center">
-                <p className="text-xs text-(--color-muted) mb-2">Pages</p>
-                <p className="font-semibold text-(--color-primary)">12</p>
+              <div className="premium-card p-6 text-center rounded-xl border-2 border-(--color-border) hover:shadow-md transition-all">
+                <p className="text-xs text-(--color-muted) mb-3 font-bold uppercase tracking-wider">Pages</p>
+                <p className="font-semibold text-(--color-primary) text-lg">12</p>
               </div>
             </div>
           </section>
 
           {/* Main Content Area */}
-          <section className="premium-card border border-(--color-border)">
-            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-(--color-border)">
-              <FileText size={18} className="text-(--color-accent)" />
-              <h3 className="section-title text-2xl text-(--color-primary)">Key Takeaways</h3>
+          <section className="bg-white rounded-2xl border-2 border-(--color-border) shadow-sm hover:shadow-md transition-shadow p-8 lg:p-12">
+            <div className="flex items-start gap-4 mb-12 pb-8 border-b-2 border-(--color-border)">
+              <div className="p-2.5 rounded-lg bg-(--color-accent)/10 shrink-0 mt-1">
+                <FileText size={28} className="text-(--color-accent)" />
+              </div>
+              <div>
+                <h3 className="section-title text-3xl font-semibold text-(--color-primary)">Key Takeaways</h3>
+                <p className="text-sm text-(--color-muted) mt-2">Core insights and actionable takeaways from this article</p>
+              </div>
             </div>
-            <div className="prose prose-slate max-w-none space-y-6 text-(--color-primary)/90">
+            <div className="prose prose-slate max-w-none space-y-8 text-(--color-primary)/90">
               <p 
-                className="leading-7 font-serif text-lg"
+                className="leading-8 font-serif text-lg lg:text-xl text-(--color-primary)"
                 style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
               >
                 {article.content}
               </p>
-              <ul className="space-y-4 text-sm leading-6 text-(--color-muted) mt-6">
+              <ul className="space-y-6 text-base leading-8 mt-10 pt-10 border-t-2 border-(--color-border)">
                 {article.keyPoints.map((point, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="text-(--color-accent) font-bold">✓</span>
-                    <span><strong>{point.title}:</strong> {point.desc}</span>
+                  <li key={i} className="flex gap-5 items-start">
+                    <span className="text-(--color-accent) font-bold text-2xl leading-none mt-1 shrink-0">✓</span>
+                    <div className="flex-1">
+                      <strong className="text-(--color-primary) text-lg block mb-2">{point.title}</strong>
+                      <span className="text-(--color-muted) leading-relaxed">{point.desc}</span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -166,22 +175,29 @@ function ArticleDetails() {
 
         {/* Sidebar */}
         <aside className="space-y-8">
-          <div className="paper-panel sticky top-8 space-y-6 border border-(--color-border) p-8 shadow-sm">
-            <div className="flex items-center gap-2 border-b border-(--color-border) pb-4">
-              <BookOpen size={18} className="text-(--color-accent)" />
-              <h3 className="font-serif text-xl font-medium text-(--color-primary)">Further Reading</h3>
+          <div className="paper-panel sticky top-10 space-y-7 border-2 border-(--color-border) p-8 lg:p-10 rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-3 border-b-2 border-(--color-border) pb-6">
+              <div className="p-2 rounded-lg bg-(--color-accent)/10">
+                <BookOpen size={20} className="text-(--color-accent)" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-semibold text-(--color-primary)">Further Reading</h3>
+                <p className="text-xs text-(--color-muted) mt-1">Related articles & resources</p>
+              </div>
             </div>
             
             <ul className="space-y-6">
               {article.relatedReads.map((res, i) => (
                 <li key={i} className="group cursor-pointer">
-                  <p className="text-sm font-medium transition-colors group-hover:text-(--color-accent)">{res.title}</p>
-                  <p className="text-xs text-(--color-muted)">{res.date}</p>
+                  <p className="text-sm font-semibold text-(--color-primary) group-hover:text-(--color-accent) transition-colors line-clamp-2">{res.title}</p>
+                  <p className="text-xs text-(--color-muted) mt-2 flex items-center gap-1">
+                    <span>📅</span> {res.date}
+                  </p>
                 </li>
               ))}
             </ul>
 
-            <div className="pt-4">
+            <div className="pt-6 border-t-2 border-(--color-border)">
               <Button className="w-full justify-center gap-2" variant="outline">
                 <Share2 size={16} />
                 Share Article
@@ -189,6 +205,7 @@ function ArticleDetails() {
             </div>
           </div>
         </aside>
+      </div>
       </div>
     </div>
   )

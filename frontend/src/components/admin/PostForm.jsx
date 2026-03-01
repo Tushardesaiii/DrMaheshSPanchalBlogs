@@ -132,7 +132,7 @@ function PostForm({ onSubmit }) {
         {/* Basic Information Section */}
         <div className="admin-section">
           <h3 className="admin-section-title">
-            <span>📝</span>
+           
             Basic Information
           </h3>
           
@@ -156,7 +156,7 @@ function PostForm({ onSubmit }) {
         {/* Categories Section */}
         <div className="admin-section">
           <h3 className="admin-section-title">
-            <span>🏷️</span>
+            
             Categories & Sections
           </h3>
           
@@ -186,7 +186,7 @@ function PostForm({ onSubmit }) {
           </div>
             {formData.categories.length === 0 && (
               <p className="mt-3 text-sm font-medium text-red-600" role="alert">
-                ⚠️ Please select at least one category
+                 Please select at least one category
               </p>
             )}
           </div>
@@ -195,7 +195,7 @@ function PostForm({ onSubmit }) {
         {/* Content Section */}
         <div className="admin-section">
           <h3 className="admin-section-title">
-            <span>✍️</span>
+           
             Article Content
           </h3>
           
@@ -217,17 +217,27 @@ function PostForm({ onSubmit }) {
             required
             rows={8}
           />
-          <p className="mt-1.5 text-xs text-(--color-muted)">
-            {formData.description.length} characters • You can resize this field by dragging the bottom-right corner
+          <p className="admin-helper-text mt-2">
+            {formData.description.length} characters • Drag from the bottom-right corner to resize this field
           </p>
         </div>
+        </div>
 
+        {/* Additional Details Section */}
+        <div className="admin-section">
+          <h3 className="admin-section-title">
+            
+            Additional Details (Optional)
+          </h3>
+          
         <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <p className="admin-field-label">Event/Publication Date</p>
+          <div className="admin-form-group">
+            <label htmlFor="eventDate" className="admin-field-label">Event/Publication Date</label>
             <input
+              id="eventDate"
               type="date"
-              className="admin-input mt-2"
+              className="admin-input"
+              aria-label="Event or publication date"
               value={formData.eventDate}
               onChange={(e) => handleChange('eventDate', e.target.value)}
             />
@@ -236,104 +246,152 @@ function PostForm({ onSubmit }) {
           <div>
             <p className="admin-field-label">Location (Optional)</p>
             <Input
-              className="admin-input mt-2"
+              id="location"
+              className="admin-input"
               placeholder="e.g., Conference Hall, Online"
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
+              aria-label="Event location"
             />
+            <p className="admin-helper-text">Physical location or virtual platform</p>
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <p className="admin-field-label">Start Time (Optional)</p>
+          <div className="admin-form-group">
+            <label htmlFor="startTime" className="admin-field-label">Start Time</label>
             <input
+              id="startTime"
               type="time"
-              className="admin-input mt-2"
+              className="admin-input"
               value={formData.eventTimeStart}
               onChange={(e) => handleChange('eventTimeStart', e.target.value)}
+              aria-label="Event start time"
             />
           </div>
-          <div>
-            <p className="admin-field-label">End Time (Optional)</p>
+          <div class="admin-form-group">
+            <label htmlFor="endTime" className="admin-field-label">End Time</label>
             <input
+              id="endTime"
               type="time"
-              className="admin-input mt-2"
+              className="admin-input"
               value={formData.eventTimeEnd}
               onChange={(e) => handleChange('eventTimeEnd', e.target.value)}
+              aria-label="Event end time"
             />
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <p className="admin-field-label">Speaker/Author (Optional)</p>
+          <div className="admin-form-group">
+            <label htmlFor="speaker" className="admin-field-label">Speaker/Author</label>
             <Input
-              className="admin-input mt-2"
+              id="speaker"
+              className="admin-input"
               placeholder="e.g., Dr. John Doe"
               value={formData.speaker}
               onChange={(e) => handleChange('speaker', e.target.value)}
+              aria-label="Speaker or author name"
             />
           </div>
-          <div>
-            <p className="admin-field-label">External URL (Optional)</p>
+          <div className="admin-form-group">
+            <label htmlFor="externalUrl" className="admin-field-label">External URL</label>
             <Input
+              id="externalUrl"
               type="url"
-              className="admin-input mt-2"
+              className="admin-input"
               placeholder="https://example.com"
               value={formData.externalUrl}
               onChange={(e) => handleChange('externalUrl', e.target.value)}
+              aria-label="External URL link"
             />
+            <p className="admin-helper-text">Link to event registration, resources, or related content</p>
           </div>
         </div>
+        </div>
 
+        {/* Settings Section */}
+        <div className="admin-section">
+          <h3 className="admin-section-title">
+            
+            Publishing Settings
+          </h3>
+          
         <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <p className="admin-field-label">Visibility</p>
+          <div className="admin-form-group">
+            <label htmlFor="visibility" className="admin-field-label">Visibility</label>
             <select
-              className="admin-select mt-2"
+              id="visibility"
+              className="admin-select"
               value={formData.visibility}
               onChange={(e) => handleChange('visibility', e.target.value)}
+              aria-label="Content visibility level"
             >
               <option value="Public">Public</option>
               <option value="Members">Members</option>
               <option value="Internal">Internal</option>
             </select>
+            <p className="admin-helper-text">Control who can view this content</p>
           </div>
-          <div>
-            <p className="admin-field-label">Featured Content</p>
-            <label className="mt-2 flex items-center gap-3 rounded-lg border border-(--color-border) bg-white px-4 py-3 cursor-pointer hover:bg-gray-50">
+          <div className="admin-form-group">
+            <label className="admin-field-label">Featured Content</label>
+            <label className="mt-3 flex items-center gap-3 rounded-lg border-2 border-(--color-border) bg-white px-5 py-4 cursor-pointer hover:bg-gray-50 hover:border-(--color-accent) transition-all duration-200">
               <input
                 type="checkbox"
                 checked={formData.featured}
                 onChange={(e) => handleChange('featured', e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                aria-label="Mark content as featured"
               />
-              <span className="text-sm text-(--color-primary)">Mark as featured</span>
+              <span className="text-sm font-medium text-(--color-primary)">Highlight as featured content</span>
             </label>
+            <p className="admin-helper-text mt-2">Featured content appears prominently on the homepage</p>
           </div>
         </div>
+        </div>
 
-        <label className="admin-dropzone">
-          <input type="file" className="hidden" onChange={handleFileChange} multiple accept="image/*,.pdf,.doc,.docx" />
-          <p className="admin-field-label">Attachments (Optional)</p>
-          <p className="text-sm text-(--color-muted)">Drop images, PDFs, or documents here.</p>
-          <p className="text-xs text-(--color-muted)">Supports images, PDFs, Word documents</p>
-        </label>
+        {/* File Upload Section */}
+        <div className="admin-section">
+          <h3 className="admin-section-title">
+            <span>📎</span>
+            Attachments & Media
+          </h3>
+          
+          <div className="admin-form-group">
+            <label className="admin-field-label">Upload Files (Optional)</label>
+            <p className="admin-helper-text mb-4">
+              Add images, PDFs, or documents to enhance your article. Maximum 10 files.
+            </p>
+            <label className="admin-dropzone" aria-label="File upload area">
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={handleFileChange} 
+                multiple 
+                accept="image/*,.pdf,.doc,.docx"
+                aria-label="Upload files"
+              />
+              <p className="text-base font-semibold text-(--color-primary)"> Drop files here or click to browse</p>
+              <p className="text-sm text-(--color-muted) mt-2">Supports: Images (JPG, PNG), PDFs, Word documents</p>
+            </label>
+          </div>
 
         {fileInputs.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3 mt-6">
             <p className="text-sm font-semibold text-(--color-primary)">Selected Files ({fileInputs.length})</p>
             {fileInputs.map((file, idx) => (
-              <div key={idx} className="flex items-center justify-between rounded-lg bg-(--admin-surface) p-3 text-sm">
+              <div key={idx} className="flex items-center justify-between rounded-xl border-2 border-(--color-border) bg-white p-4 text-sm hover:border-(--color-accent) transition-colors">
                 <div className="flex-1">
-                  <p className="font-medium">{file.name}</p>
-                  <p className="text-xs text-(--color-muted)">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                  <p className="font-semibold text-(--color-primary)">{file.name}</p>
+                  <p className="text-xs text-(--color-muted) mt-1">
+                    Size: {(file.size / 1024 / 1024).toFixed(2)} MB • Type: {file.type || 'Unknown'}
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => removeFile(idx)}
-                  className="ml-4 rounded px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  className="ml-4 rounded-lg px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-300 transition-all"
+                  aria-label={`Remove ${file.name}`}
                 >
                   Remove
                 </button>
@@ -341,14 +399,22 @@ function PostForm({ onSubmit }) {
             ))}
           </div>
         )}
+        </div>
 
-        <Button
-          className="admin-button w-full"
-          type="submit"
-          disabled={submitting}
-        >
-          {submitting ? 'Publishing...' : 'Publish Article'}
-        </Button>
+        {/* Submit Button */}
+        <div className="pt-6 border-t-2 border-(--color-border)">
+          <Button
+            className="admin-button w-full py-4 text-base font-bold"
+            type="submit"
+            disabled={submitting}
+            aria-label={submitting ? 'Publishing article' : 'Publish article'}
+          >
+            {submitting ? ' Publishing...' : ' Publish Article'}
+          </Button>
+          <p className="text-center text-sm text-(--color-muted) mt-4">
+            Your article will be published immediately and visible based on the visibility setting.
+          </p>
+        </div>
       </form>
     </Card>
   )

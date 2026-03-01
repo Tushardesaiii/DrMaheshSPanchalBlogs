@@ -112,7 +112,7 @@ function CollectionPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 space-y-12 py-10">
+    <div className="mx-auto max-w-6xl px-6 space-y-12 py-5">
       {/* 1. Header Navigation */}
       <nav className="flex items-center justify-between">
         <Link to="/" className="group flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-slate-900 transition-colors">
@@ -125,8 +125,8 @@ function CollectionPage() {
       </nav>
 
       {/* 2. Hero Section */}
-      <header className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 items-start border-b border-slate-100 pb-16">
-        <div className="space-y-6">
+      <header className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10 items-start border-b border-slate-100 pb-2">
+        <div className="space-y-5">
           <div className={`inline-flex items-center gap-2 rounded-full px-4 py-1 border ${theme[data.color]}`}>
              <Icon size={14} />
              <span className="text-[10px] font-bold uppercase tracking-widest">Departmental Archive</span>
@@ -137,39 +137,34 @@ function CollectionPage() {
           <p className="text-xl leading-relaxed text-slate-500 max-w-2xl font-medium">
             {data.description}
           </p>
-          <div className="flex flex-wrap gap-2 pt-2">
-            {data.tags.map((tag) => (
-              <Badge key={tag} className="bg-white text-slate-500 border-slate-200"># {tag}</Badge>
-            ))}
-          </div>
+         
         </div>
 
         {/* Floating Side Info */}
-        <div className="hidden lg:block w-64 p-8 rounded-3xl bg-slate-50 border border-slate-100">
+        <div className="hidden lg:block w-64 p-5 rounded-3xl bg-slate-900 border border-slate-100">
            <div className="space-y-6">
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                <p className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                   Active Collection
                 </p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Last Indexed</p>
-                <p className="text-sm font-bold text-slate-900">Feb 10, 2026</p>
-              </div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Recently Indexed</p></div>
            </div>
         </div>
       </header>
 
       {/* 3. Content Stacks */}
-      <section className="space-y-8">
+      <section className="space-y-7">
         <div className="flex items-center justify-between">
            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Archived Documents</h3>
-           <div className="flex gap-2">
-             <Button variant="ghost" className="h-8 w-8 p-0"><Filter size={14} /></Button>
-             <Button variant="ghost" className="h-8 w-8 p-0"><LayoutGrid size={14} /></Button>
-           </div>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Filter size={16} />
+              Filter
+            </Button>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

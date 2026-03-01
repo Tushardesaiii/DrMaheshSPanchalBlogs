@@ -132,8 +132,8 @@ function ActivityPage() {
   return (
     <div className="min-h-screen bg-[#fafafa]">
       <div className="border-b border-slate-100 bg-white shadow-sm">
-        <div className="mx-auto max-w-6xl px-6 py-11">
-          <Link to="/" className="mb-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 transition-all hover:text-blue-600">
+        <div className="mx-auto max-w-6xl px-4 py-6">
+          <Link to="/" className="mb-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 transition-all hover:text-blue-600">
             <ChevronLeft size={14} /> Back to Library Hub
           </Link>
 
@@ -159,7 +159,7 @@ function ActivityPage() {
         </div>
       </div>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
+      <section className="mx-auto max-w-6xl px-6 py-7">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             <p className="col-span-3 text-sm text-slate-500">Loading archive...</p>
