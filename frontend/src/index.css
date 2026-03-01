@@ -94,8 +94,3 @@ select:focus {
 	outline: none;
 	box-shadow: var(--shadow-focus);
 }
-
-/* Smooth Transitions */
-* {
-	transition: color 0.3s ease, border-color 0.3s ease;
-}
