@@ -1,19 +1,25 @@
 
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import PostForm from '../components/admin/PostForm'
 import Card from '../components/ui/Card'
+import Modal from '../components/ui/Modal'
+import Button from '../components/ui/Button'
 import { useContent } from '../context/ContentContext'
-import { Trash2 } from 'lucide-react'
+import { Trash2, AlertTriangle } from 'lucide-react'
+
 function Dashboard() {
-  const { contents, addContent, loading } = useContent()
+  const { contents, addContent, deleteContent, loading } = useContent()
   const [error, setError] = useState('')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedPost, setSelectedPost] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   // Filter for posts/articles (not books)
   const posts = contents.filter((item) => {
     const hasBookSection = Array.isArray(item.sections) && item.sections.some((section) => ['Books', 'Collections', 'Educational Materials', 'Research Collections', 'Special Collections'].includes(section))
     return item.format !== 'Collection' && !hasBookSection
   })
-
 
   const handleAddContent = async (formData) => {
     setError('')
@@ -25,6 +31,35 @@ function Dashboard() {
       setError(msg)
       throw error
     }
+  }
+
+  const handleDeleteClick = (post) => {
+    setSelectedPost(post)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedPost) return
+
+    setDeleting(true)
+    const toastId = toast.loading('Deleting post...')
+    
+    try {
+      await deleteContent(selectedPost._id)
+      toast.success('Post deleted successfully!', { id: toastId })
+      setDeleteModalOpen(false)
+      setSelectedPost(null)
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+      toast.error('Failed to delete post. Please try again.', { id: toastId })
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false)
+    setSelectedPost(null)
   }
 
   return (
@@ -77,7 +112,11 @@ function Dashboard() {
                     </td>
                     <td className="py-4 text-sm">{post.visibility || 'Public'}</td>
                     <td className="py-4">
-                      <button className="rounded p-2 text-red-600 hover:bg-red-50 transition-colors">
+                      <button 
+                        onClick={() => handleDeleteClick(post)}
+                        className="rounded p-2 text-red-600 hover:bg-red-50 transition-colors"
+                        title="Delete post"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </td>
@@ -88,6 +127,50 @@ function Dashboard() {
           </div>
         )}
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        title="Delete Post"
+        description="Are you sure you want to delete this post? This action cannot be undone."
+        onClose={handleDeleteCancel}
+      >
+        <div className="space-y-4">
+          {selectedPost && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="text-red-600 shrink-0 mt-0.5" size={20} />
+                <div>
+                  <p className="font-semibold text-red-900">{selectedPost.title}</p>
+                  <p className="text-sm text-red-700 mt-1">
+                    Category: {selectedPost.sections?.[0] || selectedPost.format || 'N/A'}
+                  </p>
+                  {selectedPost.description && (
+                    <p className="text-sm text-red-600 mt-2 line-clamp-2">{selectedPost.description}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              onClick={handleDeleteCancel}
+              disabled={deleting}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+            >
+              {deleting ? 'Deleting...' : 'Delete Post'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -143,21 +143,32 @@ function BookDetails() {
           </section>
 
           {/* Book Description */}
-          <section className="prose prose-slate max-w-none space-y-6 text-(--color-primary)/90">
-            <h3 className="text-2xl font-semibold text-(--color-primary)">About This Book</h3>
-            <p className="leading-7">
-              {book.description}
-            </p>
+          <section className="premium-card border border-(--color-border)">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-(--color-border)">
+              <BookOpen size={18} className="text-(--color-accent)" />
+              <h3 className="section-title text-2xl text-(--color-primary)">About This Book</h3>
+            </div>
+            <div className="prose prose-slate max-w-none text-(--color-primary)/90">
+              <p 
+                className="leading-7 font-serif text-lg"
+                style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+              >
+                {book.description}
+              </p>
+            </div>
           </section>
 
           {/* Preview Highlights */}
-          <section className="space-y-4">
-            <h3 className="section-title text-2xl text-(--color-primary)">What You'll Find Inside</h3>
-            <ul className="space-y-3">
+          <section className="premium-card border border-(--color-border)">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-(--color-border)">
+              <FileText size={18} className="text-(--color-accent)" />
+              <h3 className="section-title text-2xl text-(--color-primary)">What You'll Find Inside</h3>
+            </div>
+            <ul className="space-y-4">
               {book.highlights.map((highlight, i) => (
-                <li key={i} className="flex gap-3 text-sm text-(--color-muted)">
-                  <span className="font-bold text-(--color-accent) shrink-0">✓</span>
-                  <span>{highlight}</span>
+                <li key={i} className="flex gap-3 text-base text-(--color-primary)/80">
+                  <span className="font-bold text-(--color-accent) shrink-0 text-lg">✓</span>
+                  <span className="leading-relaxed">{highlight}</span>
                 </li>
               ))}
             </ul>

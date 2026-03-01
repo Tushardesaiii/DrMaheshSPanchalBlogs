@@ -140,19 +140,27 @@ function ArticleDetails() {
           </section>
 
           {/* Main Content Area */}
-          <section className="prose prose-slate max-w-none space-y-6 text-(--color-primary)/90">
-            <h3 className="text-2xl font-semibold text-(--color-primary)">Key Takeaways</h3>
-            <p className="leading-7">
-              {article.content}
-            </p>
-            <ul className="space-y-4 text-sm leading-6 text-(--color-muted)">
-              {article.keyPoints.map((point, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="text-(--color-accent)">•</span>
-                  <span><strong>{point.title}:</strong> {point.desc}</span>
-                </li>
-              ))}
-            </ul>
+          <section className="premium-card border border-(--color-border)">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-(--color-border)">
+              <FileText size={18} className="text-(--color-accent)" />
+              <h3 className="section-title text-2xl text-(--color-primary)">Key Takeaways</h3>
+            </div>
+            <div className="prose prose-slate max-w-none space-y-6 text-(--color-primary)/90">
+              <p 
+                className="leading-7 font-serif text-lg"
+                style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+              >
+                {article.content}
+              </p>
+              <ul className="space-y-4 text-sm leading-6 text-(--color-muted) mt-6">
+                {article.keyPoints.map((point, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="text-(--color-accent) font-bold">✓</span>
+                    <span><strong>{point.title}:</strong> {point.desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
         </article>
 

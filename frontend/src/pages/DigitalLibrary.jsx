@@ -4,6 +4,7 @@ import Input from '../components/ui/Input'
 import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
 import BookCard from '../components/cards/BookCard'
+import ArticleCard from '../components/cards/ArticleCard'
 import { COLLECTIONS_DATA } from '../data/collections'
 import { useContent } from '../context/ContentContext'
 import { getPrimaryMedia } from '../utils/media'
@@ -15,7 +16,9 @@ function DigitalLibrary() {
   const slug = collection ?? location.pathname.split('/').filter(Boolean).pop()
   const data = COLLECTIONS_DATA[slug]
   const { loading, getNormalizedByFormats, getNormalizedBySection, getNormalizedBySections } = useContent()
-  const libraryItems = getNormalizedBySections(['Books', 'PDFs', 'Notes', 'Articles', 'Library Reports'])
+  const bookSections = ['Books', 'PDFs', 'Notes']
+  const articleSections = ['Articles', 'Library Reports']
+  const libraryItems = getNormalizedBySections([...bookSections, ...articleSections])
   const sectionFilters = {
     books: 'Books',
     pdfs: 'PDFs',
@@ -135,24 +138,34 @@ function DigitalLibrary() {
             <p className="col-span-3 text-(--color-muted)">Loading library items...</p>
           ) : slug === 'library' ? (
             libraryItems.length > 0 ? (
-              libraryItems.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))
+              libraryItems.map((item) => {
+                const isBookSection = item.sections?.some(s => bookSections.includes(s))
+                return isBookSection ? (
+                  <BookCard key={item.id} book={item} />
+                ) : (
+                  <ArticleCard key={item.id} article={item} />
+                )
+              })
             ) : (
               <p className="col-span-3 text-(--color-muted)">No library items found.</p>
             )
           ) : slug === 'articles' ? (
             (sectionItems.length > 0 ? sectionItems : articleItems).length > 0 ? (
-              (sectionItems.length > 0 ? sectionItems : articleItems).map((book) => (
-                <BookCard key={book.id} book={book} />
+              (sectionItems.length > 0 ? sectionItems : articleItems).map((item) => (
+                <ArticleCard key={item.id} article={item} />
               ))
             ) : (
               <p className="col-span-3 text-(--color-muted)">No items found for this section.</p>
             )
           ) : sectionItems.length > 0 ? (
-            sectionItems.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))
+            sectionItems.map((item) => {
+              const isBookSection = bookSections.includes(sectionName)
+              return isBookSection ? (
+                <BookCard key={item.id} book={item} />
+              ) : (
+                <ArticleCard key={item.id} article={item} />
+              )
+            })
           ) : (
             <p className="col-span-3 text-(--color-muted)">No items found for this section.</p>
           )}

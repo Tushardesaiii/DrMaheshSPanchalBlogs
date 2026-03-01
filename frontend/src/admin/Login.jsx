@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
@@ -10,19 +11,21 @@ function Login() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    setError('')
     setSubmitting(true)
+
+    const toastId = toast.loading('Signing in...')
 
     try {
       await login(email, password)
+      toast.success('Login successful! Welcome back.', { id: toastId })
       navigate('/admin')
     } catch (err) {
-      setError(err.message || 'Login failed')
+      const errorMsg = err.message || 'Login failed'
+      toast.error(errorMsg, { id: toastId })
     } finally {
       setSubmitting(false)
     }
@@ -63,11 +66,6 @@ function Login() {
                   required
                 />
               </div>
-              {error ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
-                  {error}
-                </div>
-              ) : null}
               <Button className="admin-button w-full" disabled={submitting}>
                 {submitting ? 'Signing in...' : 'Login'}
               </Button>

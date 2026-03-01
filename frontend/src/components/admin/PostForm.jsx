@@ -1,21 +1,27 @@
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 
 const CATEGORIES = [
   'Research Papers',
-  'Articles',
-  'Gujarati Content',
-  'Notes',
   'Library Reports',
+  'Gujarati Content',
+  'Events & Workshops',
+  'Activities & Events',
+  'Conferences',
+  'Workshops',
+  'Reports',
+  'Articles',
+  'Notes',
 ]
 
 function PostForm({ onSubmit }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '',
+    categories: [],
     visibility: 'Public',
     eventDate: '',
     location: '',
@@ -27,11 +33,18 @@ function PostForm({ onSubmit }) {
   })
   const [fileInputs, setFileInputs] = useState([])
   const [submitting, setSubmitting] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const toggleCategory = (category) => {
+    setFormData(prev => ({
+      ...prev,
+      categories: prev.categories.includes(category)
+        ? prev.categories.filter(c => c !== category)
+        : [...prev.categories, category]
+    }))
   }
 
   const handleFileChange = (event) => {
@@ -46,19 +59,23 @@ function PostForm({ onSubmit }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitting(true)
-    setErrorMessage('')
-    setSuccessMessage('')
+
+    const toastId = toast.loading('Publishing article...')
 
     try {
       if (!formData.title.trim() || !formData.description.trim()) {
         throw new Error('Title and description are required')
       }
 
+      if (formData.categories.length === 0) {
+        throw new Error('Please select at least one category')
+      }
+
       const formDataToSend = new FormData()
       formDataToSend.append('title', formData.title)
       formDataToSend.append('description', formData.description)
       formDataToSend.append('format', 'Article')
-      formDataToSend.append('sections', JSON.stringify([formData.category || 'Articles']))
+      formDataToSend.append('sections', JSON.stringify(formData.categories))
       formDataToSend.append('visibility', formData.visibility)
       formDataToSend.append('status', 'Published')
       formDataToSend.append('contentType', 'post')
@@ -79,11 +96,12 @@ function PostForm({ onSubmit }) {
 
       await onSubmit(formDataToSend)
       
-      setSuccessMessage(`✅ "${formData.title}" published successfully!`)
+      toast.success(`"${formData.title}" published successfully!`, { id: toastId })
+      
       setFormData({
         title: '',
         description: '',
-        category: '',
+        categories: [],
         visibility: 'Public',
         eventDate: '',
         location: '',
@@ -94,11 +112,9 @@ function PostForm({ onSubmit }) {
         featured: false,
       })
       setFileInputs([])
-      
-      setTimeout(() => setSuccessMessage(''), 4000)
     } catch (error) {
       const errorMsg = error?.message || 'Failed to publish post'
-      setErrorMessage(`❌ ${errorMsg}`)
+      toast.error(errorMsg, { id: toastId })
     } finally {
       setSubmitting(false)
     }
@@ -112,56 +128,98 @@ function PostForm({ onSubmit }) {
         <p className="mt-2 text-sm text-(--color-muted)">Share your articles, research, and content.</p>
       </div>
 
-      {successMessage && (
-        <div className="mt-4 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-800">
-          {successMessage}
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="mt-4 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800">
-          {errorMessage}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <p className="admin-field-label">Article Title</p>
+      <form onSubmit={handleSubmit} className="mt-8 space-y-8">
+        {/* Basic Information Section */}
+        <div className="admin-section">
+          <h3 className="admin-section-title">
+            <span>📝</span>
+            Basic Information
+          </h3>
+          
+          <div className="admin-form-group">
+            <label htmlFor="title" className="admin-field-label">
+              Article Title *
+            </label>
             <Input
-              className="admin-input mt-2"
-              placeholder="Enter article title"
+              id="title"
+              className="admin-input"
+              placeholder="Enter a clear, descriptive title for your article"
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
               required
+              aria-required="true"
+              aria-label="Article title"
             />
-          </div>
-          <div>
-            <p className="admin-field-label">Category</p>
-            <select
-              className="admin-select mt-2"
-              value={formData.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-            >
-              <option value="">Select a category</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
-        <div>
-          <p className="admin-field-label">Description</p>
-          <textarea
-            className="admin-input mt-2 min-h-24 resize-none"
-            placeholder="Write your article description or content..."
+        {/* Categories Section */}
+        <div className="admin-section">
+          <h3 className="admin-section-title">
+            <span>🏷️</span>
+            Categories & Sections
+          </h3>
+          
+          <div className="admin-form-group">
+            <label className="admin-field-label">
+              Select Categories
+              {formData.categories.length > 0 && (
+                <span className="ml-2 text-sm font-semibold text-(--color-accent)">
+                  ({formData.categories.length} selected)
+                </span>
+              )}
+            </label>
+            <p className="admin-helper-text">
+              Choose one or more categories where this article will appear. This helps readers find your content.
+            </p>
+            <div className="admin-pill-group mt-4" role="group" aria-label="Category selection">
+            {CATEGORIES.map((category) => (
+              <label key={category} className="admin-pill">
+                <input 
+                  type="checkbox" 
+                  checked={formData.categories.includes(category)}
+                  onChange={() => toggleCategory(category)}
+                />
+                <span>{category}</span>
+              </label>
+            ))}
+          </div>
+            {formData.categories.length === 0 && (
+              <p className="mt-3 text-sm font-medium text-red-600" role="alert">
+                ⚠️ Please select at least one category
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="admin-section">
+          <h3 className="admin-section-title">
+            <span>✍️</span>
+            Article Content
+          </h3>
+          
+          <div className="admin-form-group">
+            <label htmlFor="description" className="admin-field-label">
+              Article Description / Full Content *
+            </label>
+            <p className="admin-helper-text mb-3">
+              Write your full article content here. Use proper paragraph breaks and spacing for better readability.
+            </p>
+            <textarea
+              id="description"
+              className="admin-textarea w-full"
+              aria-label="Article content"
+              aria-required="true"
+            placeholder="Write your article description or full content here...\n\nYou can write detailed content, paragraphs, and include all the information you want to share."
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
             required
+            rows={8}
           />
+          <p className="mt-1.5 text-xs text-(--color-muted)">
+            {formData.description.length} characters • You can resize this field by dragging the bottom-right corner
+          </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

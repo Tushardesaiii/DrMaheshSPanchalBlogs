@@ -100,7 +100,7 @@ function CollectionPage() {
 
   const renderCard = (item) => {
     const eventSections = new Set(['Events & Workshops', 'Conferences', 'Workshops', 'Reports', 'Gallery'])
-    const librarySections = new Set(['Books', 'PDFs', 'Notes', 'Library Reports'])
+    const librarySections = new Set(['Books', 'PDFs', 'Notes'])
 
     if (sectionName && eventSections.has(sectionName)) {
       return <EventCard key={item.id} event={item} />

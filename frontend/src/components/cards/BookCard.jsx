@@ -17,7 +17,7 @@ function BookCard({ book }) {
       <Card className="flex h-full flex-col overflow-hidden p-0">
         {/* Media Section with Overlay */}
         <div className="relative w-full overflow-hidden bg-linear-to-br from-[#f0e8df] to-[#e8dfd5]">
-          <div className="media-wrapper">
+          <div className="media-wrapper-book">
             {previewUrl ? (
               <img
                 src={previewUrl}

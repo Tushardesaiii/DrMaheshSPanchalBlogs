@@ -1,14 +1,20 @@
 
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import BookForm from '../components/admin/BookForm'
 import Card from '../components/ui/Card'
+import Modal from '../components/ui/Modal'
+import Button from '../components/ui/Button'
 import { useContent } from '../context/ContentContext'
-import { Trash2 } from 'lucide-react'
+import { Trash2, AlertTriangle } from 'lucide-react'
 import { getPrimaryMedia, getPreviewUrl } from '../utils/media'
 
 function Books() {
-  const { contents, addContent, loading } = useContent()
+  const { contents, addContent, deleteContent, loading } = useContent()
   const [error, setError] = useState('')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedBook, setSelectedBook] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   // Filter for books only
   const books = contents.filter((item) => {
@@ -26,6 +32,35 @@ function Books() {
       setError(msg)
       throw error
     }
+  }
+
+  const handleDeleteClick = (book) => {
+    setSelectedBook(book)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedBook) return
+
+    setDeleting(true)
+    const toastId = toast.loading('Deleting book...')
+    
+    try {
+      await deleteContent(selectedBook._id)
+      toast.success('Book deleted successfully!', { id: toastId })
+      setDeleteModalOpen(false)
+      setSelectedBook(null)
+    } catch (error) {
+      console.error('Failed to delete book:', error)
+      toast.error('Failed to delete book. Please try again.', { id: toastId })
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false)
+    setSelectedBook(null)
   }
 
   return (
@@ -62,7 +97,7 @@ function Books() {
                   <img
                     src={previewUrl}
                     alt={book.title}
-                    className="mb-3 aspect-video w-full rounded-lg object-cover"
+                    className="mb-3 aspect-3/4 w-full rounded-lg object-cover"
                     loading="lazy"
                     onError={(event) => {
                       if (media?.url && event.currentTarget.src !== media.url) {
@@ -73,7 +108,7 @@ function Books() {
                     }}
                   />
                 ) : (
-                  <div className="mb-3 flex aspect-video w-full items-center justify-center rounded-lg bg-linear-to-br from-[#d4a574]/20 to-[#a87d4f]/20">
+                  <div className="mb-3 flex aspect-3/4 w-full items-center justify-center rounded-lg bg-linear-to-br from-[#d4a574]/20 to-[#a87d4f]/20">
                     <span className="text-(--color-accent) text-sm font-semibold">{media?.type === 'pdf' ? 'PDF Attached' : 'Book Cover'}</span>
                   </div>
                 )}
@@ -137,7 +172,11 @@ function Books() {
                     </td>
                     <td className="py-4 text-sm">{book.sections?.[0] || '-'}</td>
                     <td className="py-4">
-                      <button className="rounded p-2 text-red-600 hover:bg-red-50 transition-colors">
+                      <button 
+                        onClick={() => handleDeleteClick(book)}
+                        className="rounded p-2 text-red-600 hover:bg-red-50 transition-colors"
+                        title="Delete book"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </td>
@@ -148,6 +187,50 @@ function Books() {
           </div>
         )}
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        title="Delete Book"
+        description="Are you sure you want to delete this book? This action cannot be undone."
+        onClose={handleDeleteCancel}
+      >
+        <div className="space-y-4">
+          {selectedBook && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="text-red-600 shrink-0 mt-0.5" size={20} />
+                <div>
+                  <p className="font-semibold text-red-900">{selectedBook.title}</p>
+                  <p className="text-sm text-red-700 mt-1">
+                    Author: {selectedBook.author || 'Unknown'} • Format: {selectedBook.format}
+                  </p>
+                  {selectedBook.description && (
+                    <p className="text-sm text-red-600 mt-2 line-clamp-2">{selectedBook.description}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              onClick={handleDeleteCancel}
+              disabled={deleting}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+            >
+              {deleting ? 'Deleting...' : 'Delete Book'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

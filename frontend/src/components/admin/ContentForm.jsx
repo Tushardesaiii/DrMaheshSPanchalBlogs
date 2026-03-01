@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
@@ -64,8 +65,6 @@ function ContentForm({ onSubmit, initialData = null }) {
   )
   const [fileInputs, setFileInputs] = useState([])
   const [submitting, setSubmitting] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -92,8 +91,8 @@ function ContentForm({ onSubmit, initialData = null }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitting(true)
-    setErrorMessage('')
-    setSuccessMessage('')
+
+    const toastId = toast.loading('Publishing content...')
 
     try {
       // Validate inputs
@@ -127,7 +126,8 @@ function ContentForm({ onSubmit, initialData = null }) {
       await onSubmit(formDataToSend)
       
       // Success!
-      setSuccessMessage(`✅ "${formData.title}" published successfully!`)
+      toast.success(`"${formData.title}" published successfully!`, { id: toastId })
+      
       setFormData({
         title: '',
         description: '',
@@ -143,13 +143,10 @@ function ContentForm({ onSubmit, initialData = null }) {
         featured: false,
       })
       setFileInputs([])
-      
-      // Clear success message after 4 seconds
-      setTimeout(() => setSuccessMessage(''), 4000)
     } catch (error) {
       console.error('Submit error:', error)
       const errorMsg = error?.message || 'Failed to publish content'
-      setErrorMessage(`❌ ${errorMsg}`)
+      toast.error(errorMsg, { id: toastId })
       console.error('Full error details:', error)
     } finally {
       setSubmitting(false)
@@ -163,20 +160,6 @@ function ContentForm({ onSubmit, initialData = null }) {
         <h3 className="admin-title mt-3 text-2xl">Create & Publish Content</h3>
         <p className="mt-2 text-sm text-(--color-muted)">Route content to multiple sections at once.</p>
       </div>
-
-      {/* Success Message */}
-      {successMessage && (
-        <div className="mt-4 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-800">
-          {successMessage}
-        </div>
-      )}
-
-      {/* Error Message */}
-      {errorMessage && (
-        <div className="mt-4 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800">
-          {errorMessage}
-        </div>
-      )}
 
       <form className="mt-8 space-y-8" onSubmit={handleSubmit}>
         {/* Title */}
@@ -195,16 +178,21 @@ function ContentForm({ onSubmit, initialData = null }) {
 
         {/* Description */}
         <div>
-          <p className="admin-field-label">Description</p>
+          <p className="admin-field-label">Content Description</p>
           <textarea
-            className="admin-textarea mt-2 w-full resize-none overflow-y-auto"
-            rows="6"
-            style={{ minHeight: '150px', maxHeight: '400px' }}
-            placeholder="Short description for cards and previews."
+            className="admin-textarea mt-2 w-full resize-y overflow-y-auto"
+            rows="8"
+            style={{ minHeight: '200px' }}
+            placeholder="Write a detailed description for your content...
+
+You can include multiple paragraphs, key points, and all the relevant information here. This will be displayed on cards and preview pages."
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
             required
           />
+          <p className="mt-1.5 text-xs text-(--color-muted)">
+            {formData.description.length} characters • You can resize this field vertically by dragging the bottom-right corner
+          </p>
         </div>
 
         {/* Event Date */}

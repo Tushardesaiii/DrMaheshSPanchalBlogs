@@ -227,10 +227,19 @@ function ContentDetails() {
           <div className="space-y-8 lg:col-span-2">
             {/* Description / Lead Paragraph */}
             {content.description && (
-              <div className="prose prose-lg max-w-none">
-                <p className="font-serif text-xl leading-relaxed text-[#1a1a1a] first-letter:font-bold first-letter:text-2xl">
-                  {content.description}
-                </p>
+              <div className="premium-card border border-(--color-border)">
+                <div className="flex items-center gap-2 mb-6 pb-4 border-b border-(--color-border)">
+                  <FileText size={18} className="text-(--color-accent)" />
+                  <h3 className="section-title text-lg text-(--color-primary)">Content</h3>
+                </div>
+                <div className="prose prose-lg max-w-none">
+                  <p 
+                    className="font-serif text-lg leading-relaxed text-[#1a1a1a]" 
+                    style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+                  >
+                    {content.description}
+                  </p>
+                </div>
               </div>
             )}
 
