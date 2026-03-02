@@ -9,7 +9,10 @@ import { verifyJWT, verifyAdmin } from "./middlewares/auth.middleware.js";
 const app = express();
 
 // --- CORS SETUP ---
-const allowedOrigins = (process.env.CORS_ORIGIN?.split(",") || []).filter(Boolean);
+const allowedOrigins = (process.env.CORS_ORIGIN?.split(",") || [])
+  .map(origin => origin.trim())
+  .map(origin => origin.replace(/\/$/, '')) // Remove trailing slashes that break routing
+  .filter(Boolean);
 
 // Fallback for dev: always allow localhost if no CORS_ORIGIN set
 if (allowedOrigins.length === 0) {
@@ -33,8 +36,11 @@ const corsOptions = {
       return callback(null, true);
     }
     
+    // Normalize origin by removing trailing slash for comparison
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    
     // Check if origin is allowed
-    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    if (allowedOrigins.includes(normalizedOrigin) || allowedOrigins.includes('*')) {
       console.log('✅ Origin allowed:', origin);
       callback(null, true);
     } else {
@@ -63,7 +69,8 @@ app.get("/health", (req, res) => {
   res.status(200).json({ 
     status: "OK", 
     message: "Server is running",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    cors: allowedOrigins
   });
 });
 
