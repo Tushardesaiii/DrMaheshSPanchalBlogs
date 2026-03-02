@@ -56,10 +56,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Handle preflight for all routes
-app.options('*', (req, res) => {
-  res.sendStatus(200);
-});
 
 // --- Middleware ---
 app.use(express.json({ limit: "16kb" }));
