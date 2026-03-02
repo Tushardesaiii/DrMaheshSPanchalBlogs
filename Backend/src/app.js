@@ -56,7 +56,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
+// Handle preflight for all routes
+app.options('*', (req, res) => {
+  res.sendStatus(200);
+});
 
 // --- Middleware ---
 app.use(express.json({ limit: "16kb" }));
@@ -134,8 +137,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// --- 404 Handler ---
-app.use("*", (req, res) => {
+// --- 404 Handler for undefined routes ---
+app.use((req, res) => {
   console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
