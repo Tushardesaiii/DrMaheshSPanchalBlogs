@@ -11,11 +11,12 @@ export default defineConfig({
     host: true,
     proxy: {
       // Optional: Proxy API requests during development
-      // '/api': {
-      //   target: 'http://localhost:8000',
-      //   changeOrigin: true,
-      // }
-    }
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      }
+    },
+    historyApiFallback: true,
   },
   build: {
     outDir: 'dist',
