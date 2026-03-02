@@ -9,7 +9,6 @@ const CATEGORIES = [
   'Library Reports',
   'Gujarati Content',
   'Events & Workshops',
-  'Activities & Events',
   'Conferences',
   'Workshops',
   'Reports',
