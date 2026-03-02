@@ -154,10 +154,7 @@ function PostForm({ onSubmit }) {
 
         {/* Categories Section */}
         <div className="admin-section">
-          <h3 className="admin-section-title">
-            
-            Categories & Sections
-          </h3>
+          
           
           <div className="admin-form-group">
             <label className="admin-field-label">
@@ -184,7 +181,7 @@ function PostForm({ onSubmit }) {
             ))}
           </div>
             {formData.categories.length === 0 && (
-              <p className="mt-3 text-sm font-medium text-red-600" role="alert">
+              <p className="mt-3 text-sm font-medium text-red-400" role="alert">
                  Please select at least one category
               </p>
             )}
@@ -193,45 +190,40 @@ function PostForm({ onSubmit }) {
 
         {/* Content Section */}
         <div className="admin-section">
-          <h3 className="admin-section-title">
-           
-            Article Content
-          </h3>
+          
           
           <div className="admin-form-group">
             <label htmlFor="description" className="admin-field-label">
               Article Description / Full Content *
             </label>
             <p className="admin-helper-text mb-3">
-              Write your full article content here. Use proper paragraph breaks and spacing for better readability.
+              Write your full article content here.
             </p>
             <textarea
               id="description"
               className="admin-textarea w-full"
               aria-label="Article content"
               aria-required="true"
-            placeholder="Write your article description or full content here...\n\nYou can write detailed content, paragraphs, and include all the information you want to share."
+            placeholder="Write your article description or full content here.
+You can write detailed content, paragraphs, and include all the information you want to share."
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
             required
             rows={8}
           />
           <p className="admin-helper-text mt-2">
-            {formData.description.length} characters • Drag from the bottom-right corner to resize this field
+            {formData.description.length} characters • found 
           </p>
         </div>
         </div>
 
         {/* Additional Details Section */}
         <div className="admin-section">
-          <h3 className="admin-section-title">
-            
-            Additional Details (Optional)
-          </h3>
+          
           
         <div className="grid gap-6 md:grid-cols-2">
           <div className="admin-form-group">
-            <label htmlFor="eventDate" className="admin-field-label">Event/Publication Date</label>
+            <label htmlFor="eventDate" className="admin-field-label border-3 p-3 rounded-md md">Event/Publication Date</label>
             <input
               id="eventDate"
               type="date"
@@ -240,9 +232,8 @@ function PostForm({ onSubmit }) {
               value={formData.eventDate}
               onChange={(e) => handleChange('eventDate', e.target.value)}
             />
-            <p className="mt-1 text-xs text-(--color-muted)">Optional: For events or dated content</p>
-          </div>
-          <div>
+                </div>
+          <div className='pb-4'>
             <p className="admin-field-label">Location (Optional)</p>
             <Input
               id="location"
@@ -258,7 +249,7 @@ function PostForm({ onSubmit }) {
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="admin-form-group">
-            <label htmlFor="startTime" className="admin-field-label">Start Time</label>
+            <label htmlFor="startTime" className="admin-field-label border-3 p-3 rounded-md md">Start Time</label>
             <input
               id="startTime"
               type="time"
@@ -269,7 +260,7 @@ function PostForm({ onSubmit }) {
             />
           </div>
           <div class="admin-form-group">
-            <label htmlFor="endTime" className="admin-field-label">End Time</label>
+            <label htmlFor="endTime" className="admin-field-label border-3 p-3 rounded-md md">End Time</label>
             <input
               id="endTime"
               type="time"
@@ -281,7 +272,7 @@ function PostForm({ onSubmit }) {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid pt-2 gap-6 md:grid-cols-2">
           <div className="admin-form-group">
             <label htmlFor="speaker" className="admin-field-label">Speaker/Author</label>
             <Input
@@ -304,14 +295,14 @@ function PostForm({ onSubmit }) {
               onChange={(e) => handleChange('externalUrl', e.target.value)}
               aria-label="External URL link"
             />
-            <p className="admin-helper-text">Link to event registration, resources, or related content</p>
+            <p className="admin-helper-text text-black/50">Link to event registration, resources, or related content</p>
           </div>
         </div>
         </div>
 
         {/* Settings Section */}
         <div className="admin-section">
-          <h3 className="admin-section-title">
+          <h3 className="admin-section-title pb-3">
             
             Publishing Settings
           </h3>
@@ -330,7 +321,7 @@ function PostForm({ onSubmit }) {
               <option value="Members">Members</option>
               <option value="Internal">Internal</option>
             </select>
-            <p className="admin-helper-text">Control who can view this content</p>
+           
           </div>
           <div className="admin-form-group">
             <label className="admin-field-label">Featured Content</label>

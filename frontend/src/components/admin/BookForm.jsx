@@ -94,12 +94,12 @@ function BookForm({ onSubmit }) {
         <p className="mt-2 text-sm text-(--color-muted)">Add books, e-books, and collections to your library.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-8">
+      <form onSubmit={handleSubmit} className="mt-8  space-y-8">
         {/* Basic Information Section */}
         <div className="admin-section">
           
           
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 pb-4">
           <div className="admin-form-group">
             <label htmlFor="title" className="admin-field-label">Book Title *</label>
             <Input
@@ -165,10 +165,7 @@ function BookForm({ onSubmit }) {
 
         {/* Content Section */}
         <div className="admin-section">
-          <h3 className="admin-section-title">
-            <span></span>
-            Book Description
-          </h3>
+         
           
           <div className="admin-form-group">
             <label htmlFor="description" className="admin-field-label">Book Description / Synopsis </label>
@@ -187,7 +184,7 @@ function BookForm({ onSubmit }) {
             rows={8}
           />
           <p className="admin-helper-text mt-2">
-            {formData.description.length} characters • Drag from the bottom-right corner to resize
+            {formData.description.length} characters • 
           </p>
         </div>
         </div>
@@ -212,7 +209,7 @@ function BookForm({ onSubmit }) {
               <option value="Members">Members</option>
               <option value="Internal">Internal</option>
             </select>
-            <p className="admin-helper-text mt-2">Control who can view this book</p>
+            
           </div>
         </div>
 
@@ -237,7 +234,7 @@ function BookForm({ onSubmit }) {
 
         {fileInputs.length > 0 && (
           <div className="space-y-3 mt-6">
-            <p className="text-sm font-semibold text-(--color-primary)">📂 Selected Files ({fileInputs.length})</p>
+            <p className="text-sm font-semibold text-(--color-primary)"> Selected Files ({fileInputs.length})</p>
             {fileInputs.map((file, idx) => (
               <div key={idx} className="flex items-center justify-between rounded-xl border-2 border-(--color-border) bg-white p-4 text-sm hover:border-(--color-accent) transition-colors">
                 <div className="flex-1">
@@ -268,7 +265,7 @@ function BookForm({ onSubmit }) {
             disabled={submitting}
             aria-label={submitting ? 'Publishing book' : 'Publish book'}
           >
-            {submitting ? '⏳ Publishing...' : '🚀 Publish Book'}
+            {submitting ? ' Publishing...' : ' Publish Book'}
           </Button>
           <p className="text-center text-sm text-(--color-muted) mt-4">
             Your book will be published immediately and visible in the library.
