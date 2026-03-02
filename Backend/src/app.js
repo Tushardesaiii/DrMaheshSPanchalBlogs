@@ -8,16 +8,22 @@ import { verifyJWT, verifyAdmin } from "./middlewares/auth.middleware.js";
 
 const app = express();
 
-// CORS configuration for production
-const allowedOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : ['http://localhost:5173'];
+// --- CORS SETUP ---
+const allowedOrigins = (process.env.CORS_ORIGIN?.split(",") || []).filter(Boolean);
+
+// Fallback for dev: always allow localhost if no CORS_ORIGIN set
+if (allowedOrigins.length === 0) {
+  allowedOrigins.push("http://localhost:5173");
+  allowedOrigins.push("http://localhost:3000");
+  allowedOrigins.push("http://127.0.0.1:5173");
+  allowedOrigins.push("http://127.0.0.1:3000");
+}
 
 console.log('🔒 CORS Configuration:');
 console.log('  Allowed Origins:', allowedOrigins);
 console.log('  Environment:', process.env.NODE_ENV || 'development');
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     console.log('📥 Incoming request from origin:', origin || 'NO ORIGIN (Postman/curl)');
     
@@ -28,7 +34,7 @@ app.use(cors({
     }
     
     // Check if origin is allowed
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       console.log('✅ Origin allowed:', origin);
       callback(null, true);
     } else {
@@ -38,19 +44,42 @@ app.use(cors({
     }
   },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Set-Cookie'],
+};
 
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests
+
+// --- Middleware ---
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+// --- Health Check Route ---
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "OK", 
+    message: "Server is running",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// --- API Routes ---
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", verifyJWT, verifyAdmin, adminRoutes);
 app.use("/api/content", contentRoutes);
 
-// Multer and other upload errors middleware
-app.use((err, _req, res, _next) => {
+// --- Route Debugging Middleware ---
+app.use((req, res, next) => {
+  console.log(`🔍 ${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
+
+// --- Multer and Upload Errors ---
+app.use((err, req, res, next) => {
   if (err.name === 'MulterError') {
     console.error('Multer error:', err);
     return res.status(400).json({
@@ -69,26 +98,50 @@ app.use((err, _req, res, _next) => {
       data: null,
     });
   }
-  _next(err);
+  next(err);
 });
 
-// Error handling middleware
-app.use((err, _req, res, _next) => {
-  console.error('Error caught by middleware:', {
-    message: err.message,
-    statusCode: err.statusCode,
-    stack: err.stack,
-    type: err.constructor.name,
-  });
+// --- Global Error Handler ---
+app.use((err, req, res, next) => {
+  // Set CORS headers for error responses
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "");
+  res.header("Access-Control-Allow-Credentials", "true");
 
   const statusCode = err.statusCode || err.status || 500;
   const message = err.message || "Internal Server Error";
-  
-  res.status(statusCode).json({
+
+  console.error('Global error handler:', {
     statusCode,
     message,
+    url: req.url,
+    method: req.method,
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined
+  });
+
+  return res.status(statusCode).json({
     success: false,
+    statusCode,
+    message,
     data: null,
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+  });
+});
+
+// --- 404 Handler ---
+app.use("*", (req, res) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`,
+    availableRoutes: [
+      "GET /health",
+      "POST /api/auth/login",
+      "POST /api/auth/logout",
+      "GET /api/auth/me",
+      "GET /api/content",
+      "POST /api/content",
+      "GET /api/admin/ping"
+    ]
   });
 });
 
