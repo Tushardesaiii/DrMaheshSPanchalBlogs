@@ -1,123 +1,103 @@
-import { Link } from 'react-router-dom'
-import Card from '../ui/Card'
-import Badge from '../ui/Badge'
-import Button from '../ui/Button'
-import { getPrimaryMedia, getPreviewUrl } from '../../utils/media'
-import { ExternalLink, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import Card from '../ui/Card';
+import Badge from '../ui/Badge';
+import PostMediaAttachments from './PostMediaAttachments';
+import { ArrowRight, FileText, Calendar, User } from 'lucide-react';
 
 function ArticleCard({ article }) {
-  const tags = Array.isArray(article?.tags) ? article.tags : []
-  const category = article?.category || article?.format || 'General'
-  const author = article?.speaker || article?.author || 'Admin'
-  const media = getPrimaryMedia(article?.files)
-  const previewUrl = media ? getPreviewUrl(media) : ''
-  const featured = article?.featured
-  const eventDate = article?.eventDate ? new Date(article.eventDate).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  }) : null
+  const category = article?.category || article?.format || 'General';
+  const author = article?.speaker || article?.author || 'Admin';
+  
+  const hasImage = article?.files?.some(f => f.type?.includes('image') || f.url?.match(/\.(jpg|jpeg|png|webp)$/i));
+  const hasDocs = article?.files?.some(f => f.type?.includes('pdf') || f.url?.includes('.pdf'));
+  const firstImage = hasImage ? article.files.find(f => f.type?.includes('image')).url : null;
 
   return (
-    <Link to={`/content/${article?.id}`} className="block h-full group">
-      <Card className="flex h-full flex-col overflow-hidden p-0">
-        {/* Media Section with Overlay */}
-        <div className="relative w-full overflow-hidden bg-linear-to-br from-[#f0e8df] to-[#e8dfd5]">
-          <div className="media-wrapper">
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt={media?.name || article?.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.onerror = null
-                  e.currentTarget.src = media?.url || previewUrl
-                }}
-              />
+    <Link to={`/content/${article?.id}`} className="block h-132 sm:h-136 group outline-none">
+      {/* CONTAINER: 
+        - p-[2px] creates the border width.
+        - overflow-hidden clips the rotating gradient.
+      */}
+      <div className="relative h-full p-0.5 rounded-xl overflow-hidden bg-transparent transition-all duration-300">
+        
+        {/* ANIMATED LAYER: 
+          - Only visible on hover (opacity-0 to opacity-100).
+          - Uses a conic-gradient to create the "round" movement effect.
+        */}
+        <div className="absolute -inset-full bg-[conic-gradient(from_0deg,#064e3b,#10b981,#064e3b)] animate-[spin_4s_linear_infinite] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* INNER CARD: Keeps content safe and static */}
+        <Card className="relative z-10 flex h-full flex-col overflow-hidden rounded-[10px] border-none p-0 bg-white shadow-sm">
+          
+          <div className="p-5 md:p-6 flex-1 flex flex-col overflow-hidden">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+            <Badge className="rounded-none bg-[#064e3b] text-white border-none px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                {category}
+              </Badge>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <Calendar size={12} />
+                <span className="text-[10px] font-medium">
+                  {article?.eventDate ? new Date(article.eventDate).getFullYear() : '2026'}
+                </span>
+              </div>
+          </div>
+
+            {/* Title */}
+            <h3 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900 mb-3 leading-snug line-clamp-2">
+              {article?.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed mb-5 font-normal">
+              {article?.description}
+            </p>
+
+            {/* Image: No hover scale, full color */}
+            {hasImage ? (
+              <div className="relative h-32 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 mb-5 shrink-0">
+                <img 
+                  src={firstImage} 
+                  className="w-full h-full object-cover" 
+                  alt={article?.title}
+                />
+              </div>
+            ) : hasDocs ? (
+              <div className="mb-5 p-3 bg-emerald-50/30 rounded-lg border border-dashed border-emerald-200 flex items-center gap-3">
+                <FileText size={20} className="text-emerald-800" />
+                <span className="text-xs font-bold text-emerald-900 uppercase tracking-tight">Technical Documentation</span>
+              </div>
             ) : (
-              <div className="flex h-full w-full items-center justify-center min-h-56">
-                <div className="text-center">
-                  <div className="text-5xl mb-2">📄</div>
-                  <p className="text-xs uppercase tracking-widest text-(--color-muted)">No Preview</p>
+              <div className="mb-5 h-32 rounded-lg border border-dashed border-slate-200 bg-slate-50" />
+            )}
+
+            {/* Footer */}
+            <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-[10px] border border-slate-200">
+                  {author.charAt(0)}
+              </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Archive By</span>
+                  <span className="text-[11px] font-bold text-slate-900 uppercase tracking-tight">{author}</span>
                 </div>
               </div>
-            )}
-            
-            {/* Overlay on hover */}
-            <div className="absolute inset-0 bg-linear-to-t from-[rgba(15,23,42,0.7)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-              <div className="flex items-center gap-2 text-white text-sm font-semibold">
-                <ArrowRight size={16} />
-                Read Article
+
+              <div className="flex items-center gap-2 py-2 px-5 rounded-md bg-slate-50 text-slate-900 text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                View Entry
+                <ArrowRight size={14} />
               </div>
             </div>
-
-            {/* Featured Badge */}
-            {featured && (
-              <div className="absolute left-3 top-3 bg-linear-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-                ⭐ Featured
-              </div>
-            )}
-
-            {/* Media Badge */}
-            {media?.url && (
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  window.open(media.url, '_blank', 'noopener,noreferrer')
-                }}
-                className="absolute right-3 top-3 media-badge flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hover:scale-110"
-              >
-                <ExternalLink size={14} />
-                Open
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Content Section */}
-        <div className="flex flex-1 flex-col p-6">
-          <div className="mb-3">
-            <Badge variant="default">{category}</Badge>
           </div>
 
-          <h3 className="section-title text-xl mb-2 line-clamp-2 text-(--color-primary) group-hover:text-[#d4a574] transition-colors">
-            {article?.title}
-          </h3>
-
-          <p className="text-sm text-(--color-muted) line-clamp-2 mb-4 flex-1">
-            {article?.description}
-          </p>
-
-          {/* Author & Tags */}
-          <div className="space-y-3 border-t border-(--color-border) pt-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-(--color-muted) font-medium">By <span className="text-(--color-accent-dark) font-semibold">{author}</span></p>
-              {eventDate && (
-                <p className="text-xs text-(--color-muted) font-medium">{eventDate}</p>
-              )}
-            </div>
-            
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.slice(0, 2).map((tag) => (
-                  <span key={tag} className="tag-style">#{tag}</span>
-                ))}
-                {tags.length > 2 && <span className="text-xs text-(--color-muted)">+{tags.length - 2}</span>}
-              </div>
-            )}
-          </div>
-
-          {/* Button */}
-          <div className="mt-4">
-            <Button variant="ghost" className="w-full justify-center">Read Article</Button>
-          </div>
+          <div className="hidden">
+             <PostMediaAttachments files={article?.files} title={article?.title} />
         </div>
       </Card>
+      </div>
     </Link>
-  )
+  );
 }
 
-export default ArticleCard
+export default ArticleCard;

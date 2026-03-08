@@ -1,8 +1,17 @@
 import ArticleCard from '../components/cards/ArticleCard'
 import { useContent } from '../context/ContentContext'
+import { getFileType } from '../utils/media'
 
 function AllBlogs() {
   const { loading, normalizedContents } = useContent()
+  const visibleContents = normalizedContents.filter((item) => {
+    const files = Array.isArray(item?.files) ? item.files : []
+    if (files.length === 0) return true
+
+    // Hide gallery-like entries that only contain images.
+    const hasOnlyImages = files.every((file) => getFileType(file) === 'image')
+    return !hasOnlyImages
+  })
 
   return (
     <div className="space-y-8">
@@ -14,8 +23,8 @@ function AllBlogs() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {loading ? (
           <p className="col-span-3 text-(--color-muted)">Loading content...</p>
-        ) : normalizedContents.length > 0 ? (
-          normalizedContents.map((article) => (
+        ) : visibleContents.length > 0 ? (
+          visibleContents.map((article) => (
             <ArticleCard key={article.id} article={article} />
           ))
         ) : (

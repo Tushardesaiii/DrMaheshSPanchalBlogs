@@ -13,16 +13,16 @@ function BookCard({ book }) {
   const featured = book?.featured
 
   return (
-    <Link to={`/content/${book?.id}`} className="block h-full group">
+    <Link to={`/content/${book?.id}`} className="block h-132 sm:h-136">
       <Card className="flex h-full flex-col overflow-hidden p-0">
         {/* Media Section with Overlay */}
-        <div className="relative w-full overflow-hidden bg-linear-to-br from-[#f0e8df] to-[#e8dfd5]">
-          <div className="media-wrapper-book">
+        <div className="relative h-44 w-full overflow-hidden bg-linear-to-br from-[#f0e8df] to-[#e8dfd5] shrink-0">
+          <div className="h-full w-full">
             {previewUrl ? (
               <img
                 src={previewUrl}
                 alt={media?.name || book?.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
                   e.currentTarget.onerror = null
@@ -38,14 +38,6 @@ function BookCard({ book }) {
               </div>
             )}
             
-            {/* Overlay on hover */}
-            <div className="absolute inset-0 bg-linear-to-t from-[rgba(15,23,42,0.7)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-              <div className="flex items-center gap-2 text-white text-sm font-semibold">
-                <ArrowRight size={16} />
-                View Details
-              </div>
-            </div>
-
             {/* Featured Badge */}
             {featured && (
               <div className="absolute left-3 top-3 bg-linear-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
@@ -62,7 +54,7 @@ function BookCard({ book }) {
                   event.stopPropagation()
                   window.open(media.url, '_blank', 'noopener,noreferrer')
                 }}
-                className="absolute right-3 top-3 media-badge flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hover:scale-110"
+                className="absolute right-3 top-3 media-badge z-10 flex items-center gap-1.5"
               >
                 <ExternalLink size={14} />
                 Open
@@ -72,12 +64,12 @@ function BookCard({ book }) {
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-1 flex-col p-6">
+        <div className="flex flex-1 flex-col p-5 overflow-hidden">
           <div className="mb-3">
             <Badge variant="default">{category}</Badge>
           </div>
 
-          <h3 className="section-title text-xl mb-2 line-clamp-2 text-(--color-primary) group-hover:text-[#d4a574] transition-colors">
+          <h3 className="section-title text-xl mb-2 line-clamp-2 text-(--color-primary)">
             {book?.title}
           </h3>
 

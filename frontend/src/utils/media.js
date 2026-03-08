@@ -1,11 +1,22 @@
 const getFileType = (file) => {
   const mimeType = file?.type?.toLowerCase() || ''
   const url = file?.url?.toLowerCase() || ''
+  const fileName = file?.name?.toLowerCase() || ''
+  const format = file?.format?.toLowerCase() || ''
+  const resourceType = file?.resourceType?.toLowerCase() || ''
 
-  if (mimeType.startsWith('image/') || url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
+  // Cloudinary raw uploads can lose useful MIME info in delivery URLs.
+  if (resourceType === 'raw') {
+    if (format === 'pdf' || fileName.endsWith('.pdf')) {
+      return 'pdf'
+    }
+    return 'document'
+  }
+
+  if (mimeType.startsWith('image/') || url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/) || fileName.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
     return 'image'
   }
-  if (mimeType.includes('pdf') || url.includes('.pdf') || url.includes('/pdf/') || url.includes('application/pdf')) {
+  if (mimeType.includes('pdf') || format === 'pdf' || fileName.endsWith('.pdf') || url.includes('.pdf') || url.includes('/pdf/') || url.includes('application/pdf')) {
     return 'pdf'
   }
   if (mimeType.startsWith('video/') || url.match(/\.(mp4|webm|ogg|mov)$/)) {

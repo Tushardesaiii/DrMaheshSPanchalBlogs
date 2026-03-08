@@ -48,7 +48,8 @@ function PostForm({ onSubmit }) {
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files || [])
-    setFileInputs(files)
+    setFileInputs((prev) => [...prev, ...files].slice(0, 10))
+    event.target.value = ''
   }
 
   const removeFile = (index) => {

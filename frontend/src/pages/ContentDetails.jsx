@@ -4,6 +4,7 @@ import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, Fi
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import { getFileType as resolveFileType } from '../utils/media'
 
 function ContentDetails() {
   const { id } = useParams()
@@ -67,41 +68,6 @@ function ContentDetails() {
     })
   }
 
-  const getFileType = (file) => {
-    if (file.resourceType) {
-      if (file.resourceType === 'image') return 'image'
-      if (file.resourceType === 'video') return 'video'
-      if (file.resourceType === 'raw') {
-        const format = file.format?.toLowerCase() || ''
-        if (format === 'pdf') return 'pdf'
-        if (['xlsx', 'xls', 'csv'].includes(format)) return 'excel'
-        if (['docx', 'doc'].includes(format)) return 'word'
-        return 'document'
-      }
-    }
-    
-    const mimeType = file.type?.toLowerCase() || ''
-    const url = file.url?.toLowerCase() || ''
-    const fileName = file.name?.toLowerCase() || ''
-    
-    if (mimeType.startsWith('image/') || url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
-      return 'image'
-    }
-    if (mimeType.includes('pdf') || fileName.endsWith('.pdf') || url.includes('.pdf')) {
-      return 'pdf'
-    }
-    if (mimeType.includes('sheet') || mimeType.includes('excel') || fileName.match(/\.(xlsx?|csv)$/)) {
-      return 'excel'
-    }
-    if (mimeType.includes('document') || mimeType.includes('word') || fileName.match(/\.docx?$/)) {
-      return 'word'
-    }
-    if (mimeType.startsWith('video/') || url.match(/\.(mp4|webm|ogg|mov)$/)) {
-      return 'video'
-    }
-    return 'document'
-  }
-
   const handleDownload = async (file) => {
     try {
       const response = await fetch(file.url)
@@ -132,10 +98,14 @@ function ContentDetails() {
   const tags = Array.isArray(content.tags) ? content.tags : []
   const sections = Array.isArray(content.sections) ? content.sections : []
   const files = Array.isArray(content.files) ? content.files : []
+  const hasAttachments = files.length > 0
   
-  const imageFiles = files.filter(f => getFileType(f) === 'image')
-  const pdfFiles = files.filter(f => getFileType(f) === 'pdf')
-  const documentFiles = files.filter(f => !['image', 'pdf', 'video'].includes(getFileType(f)))
+  const imageFiles = files.filter((f) => resolveFileType(f) === 'image')
+  const pdfFiles = files.filter((f) => resolveFileType(f) === 'pdf')
+  const documentFiles = files.filter((f) => {
+    const type = resolveFileType(f)
+    return !['image', 'pdf', 'video'].includes(type)
+  })
 
   return (
     <div className="min-h-screen bg-linear-to-br from-[#fcfcf9] to-[#f5f3f0]">
@@ -241,6 +211,16 @@ function ContentDetails() {
             )}
 
             {/* Adaptive Media Grid - LinkedIn/Substack style */}
+            {hasAttachments && (
+              <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#666666]">
+                <span>Attachments</span>
+                <span className="rounded-full border border-gray-300 px-2.5 py-1">{files.length} total</span>
+                {imageFiles.length > 0 && <span className="rounded-full border border-gray-300 px-2.5 py-1">{imageFiles.length} photos</span>}
+                {pdfFiles.length > 0 && <span className="rounded-full border border-gray-300 px-2.5 py-1">{pdfFiles.length} PDFs</span>}
+                {documentFiles.length > 0 && <span className="rounded-full border border-gray-300 px-2.5 py-1">{documentFiles.length} docs</span>}
+              </div>
+            )}
+
             {imageFiles.length > 0 && (
               <div className="space-y-0">
                 {/* Single Image - Full Width Hero */}
@@ -416,6 +396,46 @@ function ContentDetails() {
                       <button
                         onClick={() => handleDownload(file)}
                         className="inline-flex items-center gap-1.5 rounded-lg border-2 border-red-500 px-3 py-2 text-xs font-bold text-red-500 transition-all hover:bg-red-50"
+                      >
+                        <Download size={14} />
+                        <span className="hidden sm:inline">Save</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {documentFiles.length > 0 && (
+              <div className="space-y-4">
+                {documentFiles.map((file, index) => (
+                  <div
+                    key={`doc-${index}`}
+                    className="group flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all"
+                  >
+                    <div className="shrink-0 flex h-16 w-16 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-gray-100 transition-colors">
+                      <File className="h-7 w-7 text-gray-600" strokeWidth={1.5} />
+                    </div>
+
+                    <div className="grow min-w-0">
+                      <h4 className="text-sm font-bold text-[#1a1a1a] truncate">{file.name}</h4>
+                      <p className="text-xs text-[#666666] space-x-2">
+                        <span>{(file.format || 'Document').toUpperCase()}</span>
+                        {file.size && <span>• {(file.size / 1024 / 1024).toFixed(2)} MB</span>}
+                      </p>
+                    </div>
+
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        onClick={() => window.open(file.url, '_blank')}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-gray-700 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-gray-800 hover:shadow-lg"
+                      >
+                        <ExternalLink size={14} />
+                        <span className="hidden sm:inline">Open</span>
+                      </button>
+                      <button
+                        onClick={() => handleDownload(file)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-gray-500 px-3 py-2 text-xs font-bold text-gray-700 transition-all hover:bg-gray-50"
                       >
                         <Download size={14} />
                         <span className="hidden sm:inline">Save</span>
