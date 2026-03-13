@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Search, ChevronDown, ArrowRight, X } from "lucide-react";
+import { Search, ChevronDown, ArrowRight, X, Menu } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useContent } from "../../context/ContentContext";
 
@@ -24,6 +24,7 @@ const NAV_GROUPS = [
 
 export default function SecondaryNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { normalizedContents } = useContent();
 
@@ -45,14 +46,14 @@ export default function SecondaryNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-[#B89B5E] bg-[#1F3A33] text-[#F3EBDD] shadow-md">
-      <div className="mx-auto flex max-w-350 items-center justify-between px-6 py-3">
+      <div className="mx-auto flex max-w-350 items-center justify-between gap-3 px-4 py-3 sm:px-6">
 
         {/* Brand */}
         <NavLink to="/" className="group flex flex-col">
-          <h1 className="text-2xl md:text-3xl font-serif italic tracking-tight leading-none">
+          <h1 className="text-xl font-serif italic leading-none tracking-tight sm:text-2xl md:text-3xl">
             Dr. Mahesh <span className="not-italic font-bold text-[#B89B5E]">Solanki</span>
           </h1>
-          <h4 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-[#F3EBDD]/80 group-hover:opacity-100 transition-opacity">
+          <h4 className="text-[8px] font-black uppercase tracking-[0.12em] text-[#F3EBDD]/80 transition-opacity group-hover:opacity-100 sm:text-[9px] md:text-[10px]">
             Librarian : Gujarat Technological University
           </h4>
         </NavLink>
@@ -102,7 +103,15 @@ export default function SecondaryNavbar() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            onClick={() => setMobileNavOpen((prev) => !prev)}
+            className="flex h-10 w-10 items-center justify-center rounded border-2 border-[#B89B5E] bg-transparent text-[#B89B5E] transition hover:bg-[#B89B5E] hover:text-[#1F3A33] md:hidden"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileNavOpen ? <X size={20} strokeWidth={2.8} /> : <Menu size={20} strokeWidth={2.8} />}
+          </button>
+
           <NavLink
             to="/all-blogs"
             className="hidden lg:block text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] border-b-2 border-[#B89B5E] pb-0.5 hover:text-[#B89B5E] transition-colors"
@@ -112,17 +121,45 @@ export default function SecondaryNavbar() {
 
           <button 
             onClick={() => setSearchOpen(true)}
-            className="group flex h-10 w-10 md:h-11 md:w-11 items-center justify-center border-2 border-[#B89B5E] bg-[#B89B5E] text-[#1F3A33] rounded transition-all hover:bg-[#1F3A33] hover:text-[#B89B5E]"
+            className="group flex h-10 w-10 items-center justify-center rounded border-2 border-[#B89B5E] bg-[#B89B5E] text-[#1F3A33] transition-all hover:bg-[#1F3A33] hover:text-[#B89B5E] md:h-11 md:w-11"
           >
             <Search size={20} strokeWidth={3} />
           </button>
         </div>
       </div>
 
+      {mobileNavOpen && (
+        <div className="border-t border-[#B89B5E]/40 bg-[#26473f] px-4 py-4 md:hidden">
+          <div className="space-y-4">
+            {NAV_GROUPS.map((group) => (
+              <div key={group.title} className="rounded-lg border border-[#B89B5E]/25 bg-[#1f3a33] px-3 py-3">
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#B89B5E]">{group.title}</p>
+                <div className="space-y-1.5">
+                  {group.links.map((link) => (
+                    <NavLink
+                      key={`${group.title}-${link}`}
+                      to={`/${slugify(link)}`}
+                      onClick={() => setMobileNavOpen(false)}
+                      className={({ isActive }) =>
+                        `block rounded px-2.5 py-2 text-sm font-semibold transition-colors ${
+                          isActive ? 'bg-[#B89B5E] text-[#1F3A33]' : 'text-[#F3EBDD] hover:bg-[#B89B5E]/20'
+                        }`
+                      }
+                    >
+                      {link}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Search Modal */}
       {searchOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 pt-20 px-4"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-3 pt-14 sm:px-4 sm:pt-20"
           onClick={() => setSearchOpen(false)}
         >
           <div 
@@ -130,15 +167,15 @@ export default function SecondaryNavbar() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search Input */}
-            <div className="flex items-center border-b border-gray-200 p-6">
-              <Search className="text-gray-400" size={24} />
+            <div className="flex items-center border-b border-gray-200 p-4 sm:p-6">
+              <Search className="text-gray-400" size={20} />
               <input
                 type="text"
                 placeholder="Search all content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="flex-1 ml-4 text-lg outline-none placeholder:text-gray-400"
+                className="ml-3 flex-1 text-base outline-none placeholder:text-gray-400 sm:ml-4 sm:text-lg"
               />
               <button
                 onClick={() => setSearchOpen(false)}
@@ -149,7 +186,7 @@ export default function SecondaryNavbar() {
             </div>
 
             {/* Search Results */}
-            <div className="max-h-96 overflow-y-auto p-4">
+            <div className="max-h-[70vh] overflow-y-auto p-3 sm:max-h-96 sm:p-4">
               {searchQuery.trim() ? (
                 searchResults.length > 0 ? (
                   <div className="space-y-2">

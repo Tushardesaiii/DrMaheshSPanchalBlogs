@@ -13,7 +13,7 @@ function ArticleCard({ article }) {
   const firstImage = hasImage ? article.files.find(f => f.type?.includes('image')).url : null;
 
   return (
-    <Link to={`/content/${article?.id}`} className="block h-132 sm:h-136 group outline-none">
+    <Link to={`/content/${article?.id}`} className="group block h-auto min-h-104 outline-none sm:h-136 sm:min-h-0">
       {/* CONTAINER: 
         - p-[2px] creates the border width.
         - overflow-hidden clips the rotating gradient.

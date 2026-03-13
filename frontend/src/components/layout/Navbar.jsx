@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Search, Plus, ArrowRight, X } from "lucide-react";
+import { Search, Plus, ArrowRight, X, Menu } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useContent } from "../../context/ContentContext";
 
@@ -28,6 +28,7 @@ const NAV_GROUPS = [
 
 export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { normalizedContents } = useContent();
 
@@ -52,66 +53,103 @@ export default function Navbar() {
     <header className="w-full bg-[#1F3A33] text-[#F3EBDD]">
       
       {/* Brand Section */}
-      <div className="mx-auto flex max-w-350 items-center justify-between px-12 py-10 border-b border-[#B89B5E]/30">
+      <div className="mx-auto flex max-w-350 flex-col items-start justify-between gap-5 border-b border-[#B89B5E]/30 px-4 py-6 sm:px-6 md:flex-row md:items-center md:px-12 md:py-10">
         
         <NavLink to="/" className="group">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-7xl font-serif italic leading-none tracking-tight">
+          <div className="flex flex-col gap-3 md:gap-4">
+            <h1 className="text-4xl font-serif italic leading-none tracking-tight sm:text-5xl md:text-7xl">
               Dr. Mahesh
               <span className="ml-3 not-italic font-bold text-[#B89B5E]">
                 Solanki
               </span>
             </h1>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               <span className="h-px w-16 bg-[#B89B5E]/60 group-hover:w-28 transition-all" />
-              <h4 className="text-xs uppercase tracking-[0.35em] text-[#F3EBDD]/70">
+              <h4 className="text-[10px] uppercase tracking-[0.18em] text-[#F3EBDD]/70 sm:text-xs md:tracking-[0.35em]">
                 Librarian <span className="mx-2 opacity-40">|</span> Gujarat Technological University
               </h4>
             </div>
           </div>
         </NavLink>
 
-        <div className="flex items-center gap-10">
+        <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-6 md:gap-10">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((prev) => !prev)}
+            className="flex h-10 w-10 items-center justify-center rounded border border-[#B89B5E] text-[#B89B5E] transition hover:bg-[#B89B5E] hover:text-[#1F3A33] md:hidden"
+            aria-label="Toggle navigation"
+          >
+            {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+
           <NavLink
             to="/all-blogs"
-            className="text-sm uppercase tracking-[0.25em] border-b border-transparent hover:border-[#B89B5E] transition"
+            className="text-[11px] uppercase tracking-[0.18em] border-b border-transparent hover:border-[#B89B5E] transition sm:text-sm sm:tracking-[0.25em]"
           >
             View All Blogs
           </NavLink>
 
           <button 
             onClick={() => setSearchOpen(true)}
-            className="flex items-center gap-4 bg-[#B89B5E] text-[#1F3A33] px-6 py-3 font-semibold uppercase tracking-widest hover:brightness-110 transition"
+            className="flex items-center gap-2 bg-[#B89B5E] px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#1F3A33] transition hover:brightness-110 sm:gap-3 sm:px-5 sm:py-2.5 sm:text-sm"
           >
-            <Search size={20} strokeWidth={2} />
+            <Search size={16} strokeWidth={2} className="sm:h-5 sm:w-5" />
             Search
           </button>
         </div>
       </div>
 
+      {mobileNavOpen && (
+        <div className="border-b border-[#B89B5E]/30 bg-[#24443b] px-4 py-4 md:hidden">
+          <div className="grid grid-cols-1 gap-3">
+            {NAV_GROUPS.map((group) => (
+              <div key={`mobile-${group.title}`} className="rounded-lg border border-[#B89B5E]/25 bg-[#1f3a33] px-3 py-3">
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#B89B5E]">{group.title}</p>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {group.links.map((link) => (
+                    <NavLink
+                      key={`mobile-${group.title}-${link}`}
+                      to={`/${slugify(link)}`}
+                      onClick={() => setMobileNavOpen(false)}
+                      className={({ isActive }) =>
+                        `rounded px-2.5 py-2 text-sm font-semibold transition-colors ${
+                          isActive ? 'bg-[#B89B5E] text-[#1F3A33]' : 'text-[#F3EBDD] hover:bg-[#B89B5E]/20'
+                        }`
+                      }
+                    >
+                      {link}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Navigation Grid */}
-      <nav className="bg-[#F3EBDD] text-[#1F3A33]">
+      <nav className="hidden bg-[#F3EBDD] text-[#1F3A33] md:block">
         <div className="mx-auto max-w-350">
-          <div className="grid grid-cols-1 md:grid-cols-5 divide-x divide-[#1F3A33]/10">
+          <div className="grid grid-cols-1 divide-y divide-[#1F3A33]/10 md:grid-cols-5 md:divide-y-0 md:divide-x">
 
             {NAV_GROUPS.map((group) => (
               <div
                 key={group.title}
-                className="p-12 hover:bg-[#E6DCCB] transition-colors"
+                className="p-5 transition-colors hover:bg-[#E6DCCB] sm:p-7 md:p-9"
               >
-                <h3 className="mb-8 text-xs font-bold uppercase tracking-[0.35em] text-[#1F3A33]/70 flex items-center gap-2">
+                <h3 className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[#1F3A33]/70 sm:mb-6 sm:text-xs sm:tracking-[0.3em]">
                   <Plus size={14} strokeWidth={3} />
                   {group.title}
                 </h3>
 
-                <ul className="space-y-5">
+                <ul className="space-y-3 sm:space-y-4">
                   {group.links.map((link) => (
                     <li key={link}>
                       <NavLink
                         to={`/${slugify(link)}`}
                         className={({ isActive }) =>
-                          `group flex items-center justify-between text-lg font-semibold transition-all ${
+                          `group flex items-center justify-between text-base font-semibold transition-all sm:text-lg ${
                             isActive
                               ? "text-[#B89B5E]"
                               : "hover:translate-x-2"
@@ -138,23 +176,23 @@ export default function Navbar() {
       {/* Search Modal */}
       {searchOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 pt-20 px-4"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 px-3 pt-14 sm:px-4 sm:pt-20"
           onClick={() => setSearchOpen(false)}
         >
           <div 
-            className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl"
+            className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search Input */}
-            <div className="flex items-center border-b border-gray-200 p-6">
-              <Search className="text-gray-400" size={24} />
+            <div className="flex items-center border-b border-gray-200 p-4 sm:p-6">
+              <Search className="text-gray-400" size={20} />
               <input
                 type="text"
                 placeholder="Search all content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="flex-1 ml-4 text-lg outline-none placeholder:text-gray-400"
+                className="ml-3 flex-1 text-base outline-none placeholder:text-gray-400 sm:ml-4 sm:text-lg"
               />
               <button
                 onClick={() => setSearchOpen(false)}
@@ -165,7 +203,7 @@ export default function Navbar() {
             </div>
 
             {/* Search Results */}
-            <div className="max-h-96 overflow-y-auto p-4">
+            <div className="max-h-[70vh] overflow-y-auto p-3 sm:max-h-96 sm:p-4">
               {searchQuery.trim() ? (
                 searchResults.length > 0 ? (
                   <div className="space-y-2">

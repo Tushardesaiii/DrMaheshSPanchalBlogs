@@ -251,7 +251,7 @@ function Home() {
   return (
     <div className="overflow-hidden">
       {/* 1. Full Window Hero */}
-      <section className="relative min-h-[88vh] w-full overflow-hidden ">
+      <section className="relative min-h-[82vh] w-full overflow-hidden md:min-h-[88vh]">
         <div className="absolute inset-0">
           {heroGalleryPhotos.map((photo, index) => (
             <div
@@ -277,30 +277,30 @@ function Home() {
 
         <div className="absolute inset-0  bg-linear-to-r from-black/70 via-black/40 to-black/30" />
 
-        <div className="relative z-10 flex min-h-[88vh] items-end px-6 pb-10 pt-20 md:px-12 md:pb-14">
-          <div className="mx-auto flex w-full max-w-350 flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="relative z-10 flex min-h-[82vh] items-end px-4 pb-6 pt-16 sm:px-6 md:min-h-[88vh] md:px-12 md:pb-14 md:pt-20">
+          <div className="mx-auto flex w-full max-w-350 flex-col gap-4 md:gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-4xl text-white">
-              <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#f4d9b7]">Official Website</p>
-              <h1 className="mt-4 text-4xl font-bold leading-tight md:text-6xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#f4d9b7] sm:text-xs md:tracking-[0.35em]">Official Website</p>
+              <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl md:mt-4 md:text-6xl">
                 {bannerProfile.name}
               </h1>
-              <p className="mt-3 text-lg font-medium text-white/90 md:text-2xl">
+              <p className="mt-2 text-base font-medium text-white/90 sm:text-lg md:mt-3 md:text-2xl">
                 {bannerProfile.designation}
               </p>
-              <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/85 md:text-base">
+              <p className="mt-3 max-w-3xl text-xs leading-relaxed text-white/85 sm:text-sm md:mt-4 md:text-base">
                 {bannerProfile.bio}
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-3 text-xs font-medium md:text-sm">
+              <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-medium sm:text-xs md:mt-6 md:gap-3 md:text-sm">
                 {bannerProfile.qualifications.map((qualification) => (
-                  <span key={qualification} className="rounded-full border border-white/40 bg-white/15 px-4 py-2 backdrop-blur-sm">
+                  <span key={qualification} className="rounded-full border border-white/40 bg-white/15 px-3 py-1.5 backdrop-blur-sm md:px-4 md:py-2">
                     {qualification}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="w-full max-w-sm rounded-2xl border border-white/25 bg-white/12 p-4 text-white backdrop-blur-md">
+            <div className="w-full max-w-sm rounded-2xl border border-white/25 bg-white/12 p-3 text-white backdrop-blur-md sm:p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-white/75">Current Slide</p>
               <p className="mt-1 line-clamp-2 text-sm font-semibold">{heroGalleryPhotos[activePhotoIndex]?.title || 'Academic Visual'}</p>
               <div className="mt-4 flex gap-2">
@@ -315,7 +315,7 @@ function Home() {
                 ))}
               </div>
 
-              <div className="mt-4 grid gap-2 text-sm text-white/90">
+              <div className="mt-3 grid gap-2 text-xs text-white/90 sm:text-sm">
                 <a href={`tel:${(bannerProfile.phone || '').replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 hover:text-white">
                   <Phone size={15} /> {bannerProfile.phone}
                 </a>
@@ -331,7 +331,7 @@ function Home() {
           </div>
         </div>
 
-        <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 text-white/85">
+        <div className="absolute bottom-4 left-1/2 z-20 hidden -translate-x-1/2 text-white/85 md:block">
           <a href="#home-content" className="inline-flex flex-col items-center gap-1 text-[11px] uppercase tracking-[0.2em]">
             Scroll
             <span className="h-8 w-px bg-white/65" />
@@ -339,16 +339,16 @@ function Home() {
         </div>
       </section>
 
-      <div id="home-content" className="relative z-10 bg-(--color-bg) container-shell space-y-24 pb-24 pt-16">
+      <div id="home-content" className="container-shell relative z-10 space-y-16 bg-(--color-bg) pb-16 pt-10 md:space-y-24 md:pb-24 md:pt-16">
 
       {/* 2. Enhanced Latest Updates (Dynamic Recent Posts) */}
-      <section className="relative px-4 pt-15">
+      <section className="relative px-2 pt-8 sm:px-4 md:pt-15">
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <h3 
                 ref={(el) => (headingRefs.current['updates'] = el)}
-                className="font-bold text-2xl text-[#1E293B] mb-2"
+                className="mb-2 text-xl font-bold text-[#1E293B] md:text-2xl"
               >
                 Recent Acquisitions
               </h3>
@@ -357,19 +357,19 @@ function Home() {
                 inView={headingInView['updates']} 
               />
             </div>
-            <a href="/all-blogs" className="text-xs font-bold text-[#B45309] hover:underline uppercase tracking-wider">Archive Index</a>
+            <a href="/all-blogs" className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#B45309] hover:underline md:text-xs md:tracking-wider">Archive Index</a>
           </div>
         </div>
 
         {loading ? (
           <div className="text-slate-500 text-sm font-mono">Cataloging entries...</div>
         ) : recentPosts.length > 0 ? (
-          <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar">
+          <div className="no-scrollbar flex gap-4 overflow-x-auto pb-4 md:gap-6">
             {recentPosts.map((post) => (
               <a 
                 key={post.id} 
                 href={`/content/${post.id}`}
-                className="library-card min-w-75 group relative rounded-r-xl rounded-l-sm bg-[#FAF9F6] p-6 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 border-l-4 border-[#B45309]"
+                className="library-card group relative min-w-68 rounded-l-sm rounded-r-xl border-l-4 border-[#B45309] bg-[#FAF9F6] p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl md:min-w-75 md:p-6"
               >
                 <div className="mb-4 flex justify-between items-start">
                   <span className="rounded bg-[#1E293B] px-3 py-1 text-[10px] font-bold text-[#FAF9F6] tracking-wider font-mono">
@@ -395,11 +395,11 @@ function Home() {
       </section>
 
       {/* 3. Search Bar with Library Catalog Drawer */}
-      <section className="relative mx-auto max-w-4xl px-4">
+      <section className="relative mx-auto max-w-4xl px-2 sm:px-4">
         <div className="mb-3 text-center">
           <h3 
             ref={(el) => (headingRefs.current['search'] = el)}
-            className="font-bold text-2xl text-[#1E293B] inline-block"
+            className="inline-block text-xl font-bold text-[#1E293B] md:text-2xl"
           >
             Card Catalog Search
           </h3>
@@ -409,14 +409,14 @@ function Home() {
           />
         </div>
         <div className="relative">
-          <div className="flex items-center rounded-r-lg rounded-l-sm bg-[#FAF9F6] shadow-xl  library-card">
-            <Search className="ml-6 text-[#1E293B]" size={24} />
+          <div className="library-card flex items-center rounded-l-sm rounded-r-lg bg-[#FAF9F6] shadow-xl">
+            <Search className="ml-4 text-[#1E293B] md:ml-6" size={20} />
             <input 
               type="text" 
               placeholder="Search the catalog by title, author, or subject..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent py-8 pl-4 pr-8 text-xl outline-none placeholder:text-slate-400 font-serif"
+              className="w-full bg-transparent py-4 pl-3 pr-4 text-base font-serif outline-none placeholder:text-slate-400 md:py-8 md:pl-4 md:pr-8 md:text-xl"
             />
             
           </div>
@@ -467,14 +467,14 @@ function Home() {
       </section>
 
       {/* 4. Dynamic Browse Collections Section - Library Shelves */}
-      <section className="relative px-6 pb-32">
+      <section className="relative px-2 pb-16 sm:px-4 md:px-6 md:pb-32">
         {/* Header for Discovery */}
         <div className="mx-auto mb-12 max-w-7xl">
-          <div className="flex items-end justify-between pb-8">
+          <div className="flex flex-col items-start justify-between gap-4 pb-6 md:flex-row md:items-end md:gap-0 md:pb-8">
             <div>
               <h2 
                 ref={(el) => (headingRefs.current['collections'] = el)}
-                className="text-3xl font-black tracking-tight text-[#1E293B]"
+                className="text-2xl font-black tracking-tight text-[#1E293B] md:text-3xl"
               >
                 Collection Shelves
               </h2>
@@ -484,7 +484,7 @@ function Home() {
               />
               <p className="mt-3 text-slate-600 font-medium font-serif">Hand-curated resources indexed by subject classification.</p>
             </div>
-            <a href="/library" className="text-sm font-bold text-[#B45309] hover:text-[#1E293B] transition uppercase tracking-wider">Complete Index</a>
+            <a href="/library" className="text-xs font-bold uppercase tracking-[0.16em] text-[#B45309] transition hover:text-[#1E293B] md:text-sm md:tracking-wider">Complete Index</a>
           </div>
         </div>
 
@@ -492,7 +492,37 @@ function Home() {
         {loading ? (
           <div className="text-center text-slate-500 py-10 font-mono">Retrieving from stacks...</div>
         ) : Object.keys(categoryPostsMap).length > 0 ? (
-          <div className="relative overflow-hidden py-10">
+          <>
+          <div className="md:hidden grid grid-cols-1 gap-4">
+            {Object.entries(categoryPostsMap).slice(0, 6).map(([sectionName, posts], index) => (
+              <a
+                key={`${sectionName}-mobile-${index}`}
+                href={`/${sectionName.toLowerCase().replace(/\s+/g, '-')}`}
+                className="book-spine-card group relative overflow-hidden rounded-l-sm rounded-r-2xl bg-[#FAF9F6] p-4 shadow-lg library-card"
+              >
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-[#1E293B] transition-colors group-hover:text-[#B45309]">{sectionName}</h3>
+                  <p className="mt-1 text-xs font-mono text-slate-500">{posts.length} vol{posts.length !== 1 ? 's' : ''} • Circulating</p>
+                </div>
+                <div className="space-y-2 mb-4">
+                  {posts.slice(0, 2).map((post, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                      <span className="mt-1 flex h-1.5 w-1.5 shrink-0 rounded-full bg-[#B45309]" />
+                      <span className="line-clamp-2 flex-1 font-serif">{post.title}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between border-t border-slate-200 pt-3">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500">Browse Shelf</span>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E293B] text-[#FAF9F6]">
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div className="relative hidden overflow-hidden py-10 md:block">
             <div className="flex animate-float gap-8 whitespace-nowrap">
               {Object.entries(categoryPostsMap).concat(Object.entries(categoryPostsMap)).map(([sectionName, posts], index) => (
                 <a
@@ -546,21 +576,22 @@ function Home() {
             <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-linear-to-r from-white to-transparent z-10" />
             <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-linear-to-l from-white to-transparent z-10" />
           </div>
+          </>
         ) : (
           <div className="text-center text-slate-500 py-10 font-mono">No volumes cataloged yet.</div>
         )}
       </section>
 
       {/* 5. Gallery Preview Section - Visual Archive */}
-      <section className="relative px-6 pb-12">
+      <section className="relative px-2 pb-8 sm:px-4 md:px-6 md:pb-12">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-8 flex items-end justify-between">
+          <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end md:gap-0">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Camera className="text-[#B45309]" size={20} />
                 <h2 
                   ref={(el) => (headingRefs.current['gallery'] = el)}
-                  className="text-3xl font-black tracking-tight text-[#1E293B]"
+                  className="text-2xl font-black tracking-tight text-[#1E293B] md:text-3xl"
                 >
                   Photographic Archive
                 </h2>
@@ -579,12 +610,12 @@ function Home() {
           {loading ? (
             <div className="text-center text-slate-500 py-10 font-mono">Developing plates...</div>
           ) : galleryPhotos.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
               {galleryPhotos.map((photo) => (
                 <a
                   key={photo.id}
                   href="/gallery"
-                  className="group relative block overflow-hidden rounded-r-xl rounded-l-sm bg-slate-100 shadow-md transition-all hover:shadow-2xl hover:-translate-y-1 h-50 "
+                  className="group relative block h-36 overflow-hidden rounded-l-sm rounded-r-xl bg-slate-100 shadow-md transition-all hover:-translate-y-1 hover:shadow-2xl sm:h-44 md:h-50"
                 >
                   <img
                     src={photo.url}
@@ -607,16 +638,16 @@ function Home() {
       </section>
 
       {/* 6. CV Snapshot and Contact - Biographical Entry */}
-      <section className="relative px-6 pb-24">
+      <section className="relative px-2 pb-14 sm:px-4 md:px-6 md:pb-24">
         <div className="mx-auto max-w-6xl">
-          <div className="overflow-hidden rounded-r-3xl rounded-l-sm  bg-[#FAF9F6] shadow-xl library-card">
-            <div className="grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:p-12">
+          <div className="library-card overflow-hidden rounded-l-sm rounded-r-3xl bg-[#FAF9F6] shadow-xl">
+            <div className="grid gap-6 p-5 sm:p-7 md:grid-cols-[1.4fr_1fr] md:gap-8 md:p-12">
               <div className="space-y-4">
                 <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#B45309] font-mono">Biographical Entry</p>
-                <h2 className="text-3xl font-bold leading-tight text-[#1E293B] md:text-4xl font-serif">
+                <h2 className="font-serif text-2xl font-bold leading-tight text-[#1E293B] md:text-4xl">
                   Dr. Mahesh K. Solanki
                 </h2>
-                <p className="text-base leading-relaxed text-slate-700 font-serif">
+                <p className="font-serif text-sm leading-relaxed text-slate-700 md:text-base">
                   An academic chronicle documenting scholarly contributions, institutional leadership, and professional
                   activities in Library and Information Science. This platform serves as a digital repository for research
                   publications and ongoing library initiatives.
@@ -672,10 +703,10 @@ function Home() {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#1E293B] text-[#FAF9F6] shadow-xl transition-all hover:scale-110 hover:bg-[#B45309] border-2 border-[#B45309]"
+          className="fixed bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#B45309] bg-[#1E293B] text-[#FAF9F6] shadow-xl transition-all hover:scale-110 hover:bg-[#B45309] md:bottom-8 md:right-8 md:h-14 md:w-14"
           aria-label="Scroll to top"
         >
-          <FountainPenIcon className="h-6 w-6" />
+          <FountainPenIcon className="h-5 w-5 md:h-6 md:w-6" />
         </button>
       )}
 
