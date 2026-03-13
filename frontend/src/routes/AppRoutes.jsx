@@ -24,6 +24,7 @@ import ActivityPage from '../pages/ActivityPage'
 
 // Admin Pages
 import Dashboard from '../admin/Dashboard'
+import AdminBanner from '../admin/Banner'
 import AdminBooks from '../admin/Books'
 import AdminPhotos from '../admin/Photos'
 import AdminPDFs from '../admin/PDFs'
@@ -68,6 +69,7 @@ function AppRoutes() {
         <Route path="workshops" element={<ActivityPage />} />
         <Route path="reports" element={<ActivityPage />} />
         <Route path="gallery" element={<ActivityPage />} />
+        <Route path="social-activities" element={<ActivityPage />} />
 
         
         <Route path=":collection" element={<CollectionPage />} />
@@ -79,6 +81,7 @@ function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="banner" element={<AdminBanner />} />
           <Route path="books" element={<AdminBooks />} />
           <Route path="photos" element={<AdminPhotos />} />
           <Route path="pdfs" element={<AdminPDFs />} />

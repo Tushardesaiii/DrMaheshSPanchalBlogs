@@ -9,8 +9,12 @@ const NAV_GROUPS = [
     links: ["Research Papers", "Library Reports", "Gujarati Content", "Events & Workshops"]
   },
   {
+    title: "Recognition",
+    links: ["Achievements & Awards", "Appreciation Letters", "Certificates"]
+  },
+  {
     title: "Activities & Events",
-    links: ["Conferences", "Workshops", "Reports", "Gallery"]
+    links: ["Conferences", "Workshops", "Reports", "Gallery", "Social Activities"]
   },
   {
     title: "Digital Library",
@@ -89,7 +93,7 @@ export default function Navbar() {
       {/* Navigation Grid */}
       <nav className="bg-[#F3EBDD] text-[#1F3A33]">
         <div className="mx-auto max-w-350">
-          <div className="grid grid-cols-1 md:grid-cols-4 divide-x divide-[#1F3A33]/10">
+          <div className="grid grid-cols-1 md:grid-cols-5 divide-x divide-[#1F3A33]/10">
 
             {NAV_GROUPS.map((group) => (
               <div

@@ -2,8 +2,79 @@ import { Link } from 'react-router-dom'
 import Card from '../ui/Card'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
-import { Calendar, MapPin, User } from 'lucide-react'
+import { Calendar, ExternalLink, MapPin, User } from 'lucide-react'
+import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
+import { FiLink } from 'react-icons/fi'
 import PostMediaAttachments from './PostMediaAttachments'
+
+const platformMeta = {
+  youtube: {
+    label: 'YouTube',
+    Icon: FaYoutube,
+    iconClass: 'text-red-600',
+    chipClass: 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100',
+    iconWrapClass: 'bg-red-100 ring-red-200',
+    externalClass: 'text-red-400',
+  },
+  instagram: {
+    label: 'Instagram',
+    Icon: FaInstagram,
+    iconClass: 'text-fuchsia-600',
+    chipClass: 'border-fuchsia-200 bg-linear-to-r from-pink-50 to-orange-50 text-fuchsia-700 hover:from-pink-100 hover:to-orange-100',
+    iconWrapClass: 'bg-pink-100 ring-pink-200',
+    externalClass: 'text-fuchsia-400',
+  },
+  facebook: {
+    label: 'Facebook',
+    Icon: FaFacebook,
+    iconClass: 'text-blue-600',
+    chipClass: 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100',
+    iconWrapClass: 'bg-blue-100 ring-blue-200',
+    externalClass: 'text-blue-400',
+  },
+  other: {
+    label: 'External',
+    Icon: FiLink,
+    iconClass: 'text-emerald-600',
+    chipClass: 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100',
+    iconWrapClass: 'bg-emerald-100 ring-emerald-200',
+    externalClass: 'text-emerald-400',
+  },
+}
+
+const getResourceLinks = (event) => {
+  const links = Array.isArray(event?.resourceLinks)
+    ? event.resourceLinks
+    : Array.isArray(event?.raw?.resourceLinks)
+      ? event.raw.resourceLinks
+      : []
+
+  const normalized = links
+    .map((link) => {
+      const platform = typeof link?.platform === 'string' ? link.platform.toLowerCase() : 'other'
+      const url = typeof link?.url === 'string' ? link.url.trim() : ''
+      if (!url) return null
+
+      return {
+        platform: platformMeta[platform] ? platform : 'other',
+        url,
+        label: typeof link?.label === 'string' ? link.label.trim() : '',
+      }
+    })
+    .filter(Boolean)
+
+  const fallbackExternalUrl = typeof event?.externalUrl === 'string'
+    ? event.externalUrl.trim()
+    : typeof event?.raw?.externalUrl === 'string'
+      ? event.raw.externalUrl.trim()
+      : ''
+
+  if (fallbackExternalUrl && !normalized.some((link) => link.url === fallbackExternalUrl)) {
+    normalized.push({ platform: 'other', url: fallbackExternalUrl, label: '' })
+  }
+
+  return normalized
+}
 
 function EventCard({ event }) {
   const tags = Array.isArray(event?.tags) ? event.tags : []
@@ -17,6 +88,7 @@ function EventCard({ event }) {
   const eventTime = event?.eventTime
   const speaker = event?.speaker
   const featured = event?.featured
+  const resourceLinks = getResourceLinks(event)
 
   const hasImage = event?.files?.some(f => f.type?.includes('image') || f.url?.match(/\.(jpg|jpeg|png|webp)$/i));
   const firstImage = hasImage ? event.files.find(f => f.type?.includes('image')).url : null;
@@ -97,6 +169,37 @@ function EventCard({ event }) {
                   </span>
                 ))}
                 {tags.length > 2 && <span className="text-[10px] text-slate-400">+{tags.length - 2}</span>}
+              </div>
+            )}
+
+            {resourceLinks.length > 0 && (
+              <div className="mb-5 flex flex-wrap items-center gap-2.5 border-t border-slate-50 pt-4">
+                {resourceLinks.slice(0, 4).map((resource, index) => {
+                  const meta = platformMeta[resource.platform] || platformMeta.other
+                  const Icon = meta.Icon
+
+                  return (
+                    <button
+                      key={`${resource.url}-${index}`}
+                      type="button"
+                      onClick={(clickEvent) => {
+                        clickEvent.preventDefault()
+                        clickEvent.stopPropagation()
+                        window.open(resource.url, '_blank', 'noopener,noreferrer')
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_14px_rgba(15,23,42,0.12)] ${meta.chipClass}`}
+                      aria-label={`Open ${resource.label || meta.label} link`}
+                    >
+                      <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ring-1 ${meta.iconWrapClass}`}>
+                        <Icon className={`${meta.iconClass} text-[15px]`} />
+                      </span>
+                      <span className="max-w-20 truncate text-[11px] uppercase tracking-[0.04em]">
+                        {resource.label || meta.label}
+                      </span>
+                      <ExternalLink size={13} className={meta.externalClass} />
+                    </button>
+                  )
+                })}
               </div>
             )}
 

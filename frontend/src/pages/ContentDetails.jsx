@@ -1,10 +1,76 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, File, X, ExternalLink, ZoomIn, Lock, Globe, Tag } from 'lucide-react'
+import { ChevronLeft, Calendar, User, Download, FileText, Image as ImageIcon, File, X, ExternalLink, ZoomIn, Lock, Globe, Tag, Award } from 'lucide-react'
+import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
+import { FiLink } from 'react-icons/fi'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import { getFileType as resolveFileType } from '../utils/media'
+
+const resourcePlatformMeta = {
+  youtube: {
+    label: 'YouTube',
+    Icon: FaYoutube,
+    iconClass: 'text-red-600',
+    chipClass: 'border-red-200 bg-red-50 hover:bg-red-100',
+    textClass: 'text-red-700',
+    iconWrapClass: 'bg-red-100 ring-red-200',
+    externalClass: 'text-red-400',
+  },
+  instagram: {
+    label: 'Instagram',
+    Icon: FaInstagram,
+    iconClass: 'text-fuchsia-600',
+    chipClass: 'border-fuchsia-200 bg-linear-to-r from-pink-50 to-orange-50 hover:from-pink-100 hover:to-orange-100',
+    textClass: 'text-fuchsia-700',
+    iconWrapClass: 'bg-pink-100 ring-pink-200',
+    externalClass: 'text-fuchsia-400',
+  },
+  facebook: {
+    label: 'Facebook',
+    Icon: FaFacebook,
+    iconClass: 'text-blue-600',
+    chipClass: 'border-blue-200 bg-blue-50 hover:bg-blue-100',
+    textClass: 'text-blue-700',
+    iconWrapClass: 'bg-blue-100 ring-blue-200',
+    externalClass: 'text-blue-400',
+  },
+  other: {
+    label: 'External',
+    Icon: FiLink,
+    iconClass: 'text-emerald-600',
+    chipClass: 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100',
+    textClass: 'text-emerald-700',
+    iconWrapClass: 'bg-emerald-100 ring-emerald-200',
+    externalClass: 'text-emerald-400',
+  },
+}
+
+const getResourceLinks = (content) => {
+  const links = Array.isArray(content?.resourceLinks) ? content.resourceLinks : []
+
+  const normalized = links
+    .map((link) => {
+      const platform = typeof link?.platform === 'string' ? link.platform.toLowerCase() : 'other'
+      const url = typeof link?.url === 'string' ? link.url.trim() : ''
+      if (!url) return null
+
+      return {
+        platform: resourcePlatformMeta[platform] ? platform : 'other',
+        url,
+        label: typeof link?.label === 'string' ? link.label.trim() : '',
+      }
+    })
+    .filter(Boolean)
+
+  const fallbackExternalUrl = typeof content?.externalUrl === 'string' ? content.externalUrl.trim() : ''
+  if (fallbackExternalUrl && !normalized.some((link) => link.url === fallbackExternalUrl)) {
+    normalized.push({ platform: 'other', url: fallbackExternalUrl, label: '' })
+  }
+
+  return normalized
+}
 
 function ContentDetails() {
   const { id } = useParams()
@@ -106,6 +172,7 @@ function ContentDetails() {
     const type = resolveFileType(f)
     return !['image', 'pdf', 'video'].includes(type)
   })
+  const resourceLinks = getResourceLinks(content)
 
   return (
     <div className="min-h-screen bg-linear-to-br from-[#fcfcf9] to-[#f5f3f0]">
@@ -515,22 +582,59 @@ function ContentDetails() {
                 </div>
               )}
 
-              {/* External URL Card */}
-              {content.externalUrl && (
+              {(content.recognitionType || content.awardLevel || content.issuingOrganization) && (
+                <div className="rounded-xl border-2 border-(--color-border) bg-linear-to-br from-white to-amber-50/30 p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Award size={18} className="text-(--color-accent)" />
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">Recognition</p>
+                  </div>
+                  <div className="space-y-2">
+                    {content.recognitionType && (
+                      <p className="text-sm font-semibold text-(--color-primary)">{content.recognitionType}</p>
+                    )}
+                    {content.awardLevel && (
+                      <p className="text-sm text-(--color-muted)">Level: {content.awardLevel}</p>
+                    )}
+                    {content.issuingOrganization && (
+                      <p className="text-sm text-(--color-muted)">Organization: {content.issuingOrganization}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* External Resource Card */}
+              {resourceLinks.length > 0 && (
                 <div className="rounded-xl border-2 border-(--color-border) bg-linear-to-br from-white to-amber-50/30 p-7 shadow-sm hover:shadow-md hover:border-(--color-accent)/50 transition-all">
                   <div className="flex items-center gap-2 mb-3">
                     <ExternalLink size={18} className="text-(--color-accent)" />
-                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">External Resource</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted)">Resource Links</p>
                   </div>
-                  <a 
-                    href={content.externalUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-lg font-semibold text-(--color-accent) hover:text-(--color-primary) hover:underline break-all inline-flex items-center gap-2 group transition-colors"
-                  >
-                    Visit Resource
-                    <ExternalLink size={14} className="group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  <div className="space-y-3">
+                    {resourceLinks.map((resource, index) => {
+                      const meta = resourcePlatformMeta[resource.platform] || resourcePlatformMeta.other
+                      const Icon = meta.Icon
+
+                      return (
+                        <a
+                          key={`${resource.url}-${index}`}
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`group flex items-center justify-between rounded-xl border px-3.5 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(15,23,42,0.12)] ${meta.chipClass}`}
+                        >
+                          <span className="flex min-w-0 items-center gap-2.5">
+                            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full ring-1 ${meta.iconWrapClass}`}>
+                              <Icon className={`${meta.iconClass} text-[20px]`} />
+                            </span>
+                            <span className={`truncate text-sm font-semibold ${meta.textClass}`}>
+                              {resource.label || meta.label}
+                            </span>
+                          </span>
+                          <ExternalLink size={16} className={`shrink-0 group-hover:translate-x-0.5 transition-transform ${meta.externalClass}`} />
+                        </a>
+                      )
+                    })}
+                  </div>
                 </div>
               )}
 
@@ -563,13 +667,7 @@ function ContentDetails() {
                 </div>
               )}
 
-              {/* Status Card */}
-              {content.status && (
-                <div className="rounded-xl border-2 border-(--color-border) bg-white p-7 shadow-sm hover:shadow-md transition-all">
-                  <p className="text-xs font-bold uppercase tracking-[0.08em] text-(--color-muted) mb-4">📊 Status</p>
-                  <Badge className="capitalize text-base px-4 py-2 font-semibold">{content.status}</Badge>
-                </div>
-              )}
+              
             </div>
           </aside>
         </div>

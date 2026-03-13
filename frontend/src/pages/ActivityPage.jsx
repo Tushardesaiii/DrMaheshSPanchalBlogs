@@ -44,6 +44,12 @@ const COLLECTIONS_DATA = {
     type: 'activity',
     icon: 'ImageIcon',
   },
+  'social-activities': {
+    title: 'Social Activities',
+    description: 'Community outreach activities, social impact initiatives, and service highlights.',
+    type: 'activity',
+    icon: 'Users',
+  },
 }
 
 function ActivityPage() {

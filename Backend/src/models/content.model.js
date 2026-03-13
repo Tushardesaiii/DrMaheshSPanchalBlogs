@@ -15,6 +15,19 @@ const fileSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const resourceLinkSchema = new mongoose.Schema(
+  {
+    platform: {
+      type: String,
+      enum: ["youtube", "instagram", "facebook", "other"],
+      default: "other",
+    },
+    url: { type: String, required: true, trim: true },
+    label: { type: String, trim: true },
+  },
+  { _id: false }
+);
+
 const contentSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -34,7 +47,17 @@ const contentSchema = new mongoose.Schema(
       end: { type: String }    // End time (e.g., "5:00 PM")
     },
     speaker: { type: String, trim: true }, // Speaker or author name for events
+    recognitionType: {
+      type: String,
+      enum: ["Achievement Award", "Appreciation Letter", "Certificate", "Social Activity", "Other"],
+    },
+    awardLevel: {
+      type: String,
+      enum: ["State Level", "National Level", "International Level"],
+    },
+    issuingOrganization: { type: String, trim: true },
     externalUrl: { type: String, trim: true }, // Link to external resources
+    resourceLinks: [resourceLinkSchema],
     featured: { type: Boolean, default: false }, // Mark as featured content
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },

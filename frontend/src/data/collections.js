@@ -71,4 +71,31 @@ export const COLLECTIONS_DATA = {
     type: 'activity',
     icon: 'ImageIcon',
   },
+  'achievements-and-awards': {
+    title: 'Achievements & Awards',
+    description: 'State, national, and international recognitions and milestones.',
+    type: 'library',
+    icon: 'BarChart3',
+    tags: ['State Level', 'National Level', 'International Level', 'Recognition'],
+  },
+  'appreciation-letters': {
+    title: 'Appreciation Letters',
+    description: 'Official appreciation letters and institutional acknowledgments.',
+    type: 'library',
+    icon: 'Presentation',
+    tags: ['Letters', 'Acknowledgment', 'Institutional'],
+  },
+  certificates: {
+    title: 'Certificates',
+    description: 'Professional certificates, credentials, and achievements.',
+    type: 'library',
+    icon: 'Presentation',
+    tags: ['Certificates', 'Credentials', 'Training'],
+  },
+  'social-activities': {
+    title: 'Social Activities',
+    description: 'Community outreach, social engagement, and impact programs.',
+    type: 'activity',
+    icon: 'Users',
+  },
 }

@@ -64,6 +64,34 @@ const COLLECTIONS = {
     tags: ['Workshops', 'Conferences', 'Training'],
     icon: Calendar,
     color: 'indigo'
+  },
+  'achievements-and-awards': {
+    title: 'Achievements & Awards',
+    description: 'State, national, and international recognitions celebrating impact and excellence.',
+    tags: ['State Level', 'National Level', 'International Level'],
+    icon: Award,
+    color: 'amber'
+  },
+  'appreciation-letters': {
+    title: 'Appreciation Letters',
+    description: 'Official letters of appreciation from institutions, partners, and communities.',
+    tags: ['Recognition', 'Institutional', 'Acknowledgment'],
+    icon: FileText,
+    color: 'cyan'
+  },
+  certificates: {
+    title: 'Certificates',
+    description: 'Verified certifications, training credentials, and completion records.',
+    tags: ['Professional', 'Training', 'Credentials'],
+    icon: GraduationCap,
+    color: 'emerald'
+  },
+  'social-activities': {
+    title: 'Social Activities',
+    description: 'Community outreach initiatives, social engagement, and public service highlights.',
+    tags: ['Community', 'Outreach', 'Service'],
+    icon: Calendar,
+    color: 'indigo'
   }
 }
 
@@ -99,7 +127,7 @@ function CollectionPage() {
   const sectionItems = sectionName ? getNormalizedBySection(sectionName) : []
 
   const renderCard = (item) => {
-    const eventSections = new Set(['Events & Workshops', 'Conferences', 'Workshops', 'Reports', 'Gallery'])
+    const eventSections = new Set(['Events & Workshops', 'Conferences', 'Workshops', 'Reports', 'Gallery', 'Social Activities'])
     const librarySections = new Set(['Books', 'PDFs', 'Notes'])
 
     if (sectionName && eventSections.has(sectionName)) {

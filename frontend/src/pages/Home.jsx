@@ -3,6 +3,18 @@ import { Search, ArrowRight, Camera, MapPin, Mail, Phone, UserSquare2, ChevronUp
 import { useContent } from '../context/ContentContext'
 import { getPrimaryMedia } from '../utils/media'
 
+const DEFAULT_BANNER_PROFILE = {
+  name: 'Dr. Mahesh K. Solanki',
+  designation: 'University Librarian, Gujarat Technological University',
+  bio: 'With over 18 years in Library and Information Science, committed to research support, innovation, and modern digital library services.',
+  qualifications: ['MLISc', 'GSLET', 'Ph.D. (LIS)'],
+  phone: '+91 8401067372',
+  email: 'librarian@gtu.edu.in',
+  address: 'Central Library, GTU, Chandkheda, Ahmedabad',
+}
+
+const getApiBase = () => import.meta.env.VITE_API_BASE_URL || ''
+
 // SVG Components for Library Aesthetics
 function PencilStrokeUnderline({ className = "", inView = true }) {
   return (
@@ -56,8 +68,10 @@ function Home() {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [headingInView, setHeadingInView] = useState({})
+  const [bannerSettings, setBannerSettings] = useState(null)
   
   const headingRefs = useRef({})
+  const apiBase = getApiBase()
   
   // Get all content that can be searched
   const allContent = getNormalizedByFormat('Article')
@@ -124,7 +138,7 @@ function Home() {
       .slice(0, 6) // Get first 6 photos
   }, [getNormalizedBySection])
 
-  const heroGalleryPhotos = useMemo(() => {
+  const fallbackHeroGalleryPhotos = useMemo(() => {
     if (galleryPhotos.length > 0) {
       return galleryPhotos.slice(0, 5)
     }
@@ -135,6 +149,61 @@ function Home() {
       { id: 'placeholder-3', title: 'Research Program Event', url: null },
     ]                 
   }, [galleryPhotos])
+
+  useEffect(() => {
+    const fetchBannerSettings = async () => {
+      try {
+        const response = await fetch(`${apiBase}/api/banner`)
+        if (!response.ok) return
+        const payload = await response.json()
+        setBannerSettings(payload?.data || null)
+      } catch (error) {
+        console.error('Failed to fetch banner settings:', error)
+      }
+    }
+
+    fetchBannerSettings()
+  }, [apiBase])
+
+  const bannerProfile = useMemo(() => {
+    const qualifications = Array.isArray(bannerSettings?.qualifications)
+      ? bannerSettings.qualifications.filter(Boolean)
+      : []
+
+    return {
+      name: bannerSettings?.name || DEFAULT_BANNER_PROFILE.name,
+      designation: bannerSettings?.designation || DEFAULT_BANNER_PROFILE.designation,
+      bio: bannerSettings?.bio || DEFAULT_BANNER_PROFILE.bio,
+      qualifications: qualifications.length > 0 ? qualifications : DEFAULT_BANNER_PROFILE.qualifications,
+      phone: bannerSettings?.phone || DEFAULT_BANNER_PROFILE.phone,
+      email: bannerSettings?.email || DEFAULT_BANNER_PROFILE.email,
+      address: bannerSettings?.address || DEFAULT_BANNER_PROFILE.address,
+    }
+  }, [bannerSettings])
+
+  const heroGalleryPhotos = useMemo(() => {
+    const slides = Array.isArray(bannerSettings?.slides)
+      ? bannerSettings.slides
+          .filter((slide) => slide?.url)
+          .map((slide, index) => ({
+            id: slide.publicId || `${slide.url}-${index}`,
+            title: slide.name || `Banner Slide ${index + 1}`,
+            url: slide.url,
+          }))
+      : []
+
+    if (slides.length > 0) {
+      return slides
+    }
+
+    return fallbackHeroGalleryPhotos
+  }, [bannerSettings, fallbackHeroGalleryPhotos])
+
+  useEffect(() => {
+    if (activePhotoIndex >= heroGalleryPhotos.length) {
+      setActivePhotoIndex(0)
+    }
+  }, [activePhotoIndex, heroGalleryPhotos.length])
 
    useEffect(() => {
     if (heroGalleryPhotos.length <= 1) return undefined
@@ -213,20 +282,21 @@ function Home() {
             <div className="max-w-4xl text-white">
               <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#f4d9b7]">Official Website</p>
               <h1 className="mt-4 text-4xl font-bold leading-tight md:text-6xl">
-                Dr. Mahesh K. Solanki
+                {bannerProfile.name}
               </h1>
               <p className="mt-3 text-lg font-medium text-white/90 md:text-2xl">
-                University Librarian, Gujarat Technological University
+                {bannerProfile.designation}
               </p>
               <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/85 md:text-base">
-                With over 18 years in Library and Information Science, committed to research support,
-                innovation, and modern digital library services.
+                {bannerProfile.bio}
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3 text-xs font-medium md:text-sm">
-                <span className="rounded-full border border-white/40 bg-white/15 px-4 py-2 backdrop-blur-sm">MLISc</span>
-                <span className="rounded-full border border-white/40 bg-white/15 px-4 py-2 backdrop-blur-sm">GSLET</span>
-                <span className="rounded-full border border-white/40 bg-white/15 px-4 py-2 backdrop-blur-sm">Ph.D. (LIS)</span>
+                {bannerProfile.qualifications.map((qualification) => (
+                  <span key={qualification} className="rounded-full border border-white/40 bg-white/15 px-4 py-2 backdrop-blur-sm">
+                    {qualification}
+                  </span>
+                ))}
               </div>
             </div>
 
@@ -246,15 +316,15 @@ function Home() {
               </div>
 
               <div className="mt-4 grid gap-2 text-sm text-white/90">
-                <a href="tel:+918401067372" className="inline-flex items-center gap-2 hover:text-white">
-                  <Phone size={15} /> +91 8401067372
+                <a href={`tel:${(bannerProfile.phone || '').replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 hover:text-white">
+                  <Phone size={15} /> {bannerProfile.phone}
                 </a>
-                <a href="mailto:librarian@gtu.edu.in" className="inline-flex items-center gap-2 hover:text-white">
-                  <Mail size={15} /> librarian@gtu.edu.in
+                <a href={`mailto:${bannerProfile.email}`} className="inline-flex items-center gap-2 hover:text-white">
+                  <Mail size={15} /> {bannerProfile.email}
                 </a>
                 <div className="inline-flex items-start gap-2 text-white/85">
                   <MapPin size={15} className="mt-0.5" />
-                  <span>Central Library, GTU, Chandkheda, Ahmedabad</span>
+                  <span>{bannerProfile.address}</span>
                 </div>
               </div>
             </div>

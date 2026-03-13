@@ -23,6 +23,24 @@ const categories = [
     description: 'Scholarly voice, citations, and publishing pathways.',
     count: 29,
   },
+  {
+    id: 5,
+    title: 'Achievements & Awards',
+    description: 'State, national, and international recognitions and milestones.',
+    count: 18,
+  },
+  {
+    id: 6,
+    title: 'Certificates & Letters',
+    description: 'Appreciation letters, certifications, and documented acknowledgments.',
+    count: 24,
+  },
+  {
+    id: 7,
+    title: 'Social Activities',
+    description: 'Community engagement, outreach programs, and impact initiatives.',
+    count: 16,
+  },
 ]
 
 export default categories

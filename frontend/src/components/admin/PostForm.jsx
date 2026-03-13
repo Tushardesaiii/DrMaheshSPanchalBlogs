@@ -3,18 +3,71 @@ import toast from 'react-hot-toast'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
+import { FiLink } from 'react-icons/fi'
 
 const CATEGORIES = [
   'Research Papers',
   'Library Reports',
   'Gujarati Content',
   'Events & Workshops',
+  'Achievements & Awards',
+  'Appreciation Letters',
+  'Certificates',
+  'Social Activities',
   'Conferences',
   'Workshops',
   'Reports',
   'Articles',
   'Notes',
 ]
+
+const RECOGNITION_TYPES = ['Achievement Award', 'Appreciation Letter', 'Certificate', 'Social Activity', 'Other']
+const AWARD_LEVELS = ['State Level', 'National Level', 'International Level']
+
+const RESOURCE_FIELDS = [
+  {
+    key: 'youtube',
+    label: 'YouTube Link',
+    Icon: FaYoutube,
+    placeholder: 'https://www.youtube.com/watch?v=...',
+    iconClass: 'text-red-600',
+    iconWrapClass: 'bg-red-100 ring-red-200',
+  },
+  {
+    key: 'instagram',
+    label: 'Instagram Link',
+    Icon: FaInstagram,
+    placeholder: 'https://www.instagram.com/...',
+    iconClass: 'text-fuchsia-600',
+    iconWrapClass: 'bg-pink-100 ring-pink-200',
+  },
+  {
+    key: 'facebook',
+    label: 'Facebook Link',
+    Icon: FaFacebook,
+    placeholder: 'https://www.facebook.com/...',
+    iconClass: 'text-blue-600',
+    iconWrapClass: 'bg-blue-100 ring-blue-200',
+  },
+  {
+    key: 'other',
+    label: 'Other Link',
+    Icon: FiLink,
+    placeholder: 'https://example.com/resource',
+    iconClass: 'text-emerald-600',
+    iconWrapClass: 'bg-emerald-100 ring-emerald-200',
+  },
+]
+
+const isValidHttpUrl = (value) => {
+  try {
+    const parsed = new URL(value)
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 function PostForm({ onSubmit }) {
   const [formData, setFormData] = useState({
@@ -27,7 +80,15 @@ function PostForm({ onSubmit }) {
     eventTimeStart: '',
     eventTimeEnd: '',
     speaker: '',
-    externalUrl: '',
+    recognitionType: '',
+    awardLevel: '',
+    issuingOrganization: '',
+    resourceLinks: {
+      youtube: '',
+      instagram: '',
+      facebook: '',
+      other: '',
+    },
     featured: false,
   })
   const [fileInputs, setFileInputs] = useState([])
@@ -71,6 +132,22 @@ function PostForm({ onSubmit }) {
         throw new Error('Please select at least one category')
       }
 
+      const resourceLinks = Object.entries(formData.resourceLinks)
+        .map(([platform, url]) => ({
+          platform,
+          url: String(url || '').trim(),
+        }))
+        .filter((item) => item.url.length > 0)
+
+      const invalidResourceLink = resourceLinks.find((item) => !isValidHttpUrl(item.url))
+      if (invalidResourceLink) {
+        throw new Error(`Please enter a valid URL for ${invalidResourceLink.platform}`)
+      }
+
+      if (formData.recognitionType === 'Achievement Award' && !formData.awardLevel) {
+        throw new Error('Please select award level for achievement award')
+      }
+
       const formDataToSend = new FormData()
       formDataToSend.append('title', formData.title)
       formDataToSend.append('description', formData.description)
@@ -87,7 +164,15 @@ function PostForm({ onSubmit }) {
       if (formData.eventTimeStart) formDataToSend.append('eventTimeStart', formData.eventTimeStart)
       if (formData.eventTimeEnd) formDataToSend.append('eventTimeEnd', formData.eventTimeEnd)
       if (formData.speaker) formDataToSend.append('speaker', formData.speaker)
-      if (formData.externalUrl) formDataToSend.append('externalUrl', formData.externalUrl)
+      if (formData.recognitionType) formDataToSend.append('recognitionType', formData.recognitionType)
+      if (formData.awardLevel) formDataToSend.append('awardLevel', formData.awardLevel)
+      if (formData.issuingOrganization) formDataToSend.append('issuingOrganization', formData.issuingOrganization)
+      if (resourceLinks.length > 0) {
+        formDataToSend.append('resourceLinks', JSON.stringify(resourceLinks))
+      }
+      if (formData.resourceLinks.other) {
+        formDataToSend.append('externalUrl', formData.resourceLinks.other.trim())
+      }
       formDataToSend.append('featured', formData.featured)
 
       fileInputs.forEach((file) => {
@@ -108,7 +193,15 @@ function PostForm({ onSubmit }) {
         eventTimeStart: '',
         eventTimeEnd: '',
         speaker: '',
-        externalUrl: '',
+        recognitionType: '',
+        awardLevel: '',
+        issuingOrganization: '',
+        resourceLinks: {
+          youtube: '',
+          instagram: '',
+          facebook: '',
+          other: '',
+        },
         featured: false,
       })
       setFileInputs([])
@@ -260,7 +353,7 @@ You can write detailed content, paragraphs, and include all the information you 
               aria-label="Event start time"
             />
           </div>
-          <div class="admin-form-group">
+          <div className="admin-form-group">
             <label htmlFor="endTime" className="admin-field-label border-3 p-3 rounded-md md">End Time</label>
             <input
               id="endTime"
@@ -285,18 +378,90 @@ You can write detailed content, paragraphs, and include all the information you 
               aria-label="Speaker or author name"
             />
           </div>
-          <div className="admin-form-group">
-            <label htmlFor="externalUrl" className="admin-field-label">External URL</label>
-            <Input
-              id="externalUrl"
-              type="url"
-              className="admin-input"
-              placeholder="https://example.com"
-              value={formData.externalUrl}
-              onChange={(e) => handleChange('externalUrl', e.target.value)}
-              aria-label="External URL link"
-            />
-            <p className="admin-helper-text text-black/50">Link to event registration, resources, or related content</p>
+        </div>
+
+        <div className="rounded-xl border border-(--color-border) bg-white/70 p-4">
+          <p className="admin-field-label">Recognition & Social Categorization</p>
+          <p className="admin-helper-text mt-1">Use these fields for achievements, awards, certificates, appreciation letters, and social activities.</p>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            <div className="admin-form-group">
+              <label htmlFor="recognitionType" className="admin-field-label">Type</label>
+              <select
+                id="recognitionType"
+                className="admin-select"
+                value={formData.recognitionType}
+                onChange={(event) => {
+                  const nextType = event.target.value
+                  handleChange('recognitionType', nextType)
+                  if (nextType !== 'Achievement Award') {
+                    handleChange('awardLevel', '')
+                  }
+                }}
+              >
+                <option value="">Select Type</option>
+                {RECOGNITION_TYPES.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="admin-form-group">
+              <label htmlFor="awardLevel" className="admin-field-label">Award Level</label>
+              <select
+                id="awardLevel"
+                className="admin-select"
+                value={formData.awardLevel}
+                onChange={(event) => handleChange('awardLevel', event.target.value)}
+                disabled={formData.recognitionType !== 'Achievement Award'}
+              >
+                <option value="">Select Level</option>
+                {AWARD_LEVELS.map((level) => (
+                  <option key={level} value={level}>{level}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="admin-form-group">
+              <label htmlFor="issuingOrganization" className="admin-field-label">Organization</label>
+              <Input
+                id="issuingOrganization"
+                className="admin-input"
+                placeholder="e.g., GTU / State Council"
+                value={formData.issuingOrganization}
+                onChange={(event) => handleChange('issuingOrganization', event.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-form-group pt-2">
+          <label className="admin-field-label">Platform Links</label>
+          <p className="admin-helper-text text-black/50">Add YouTube, Instagram, Facebook, or any other external resource link.</p>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {RESOURCE_FIELDS.map(({ key, label, Icon, placeholder, iconClass, iconWrapClass }) => (
+              <div key={key} className="admin-form-group">
+                <label htmlFor={`resource-${key}`} className="admin-field-label flex items-center gap-2.5">
+                  <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full ring-1 ${iconWrapClass}`}>
+                    <Icon className={`${iconClass} text-[17px]`} />
+                  </span>
+                  {label}
+                </label>
+                <Input
+                  id={`resource-${key}`}
+                  type="url"
+                  className="admin-input"
+                  placeholder={placeholder}
+                  value={formData.resourceLinks[key]}
+                  onChange={(event) =>
+                    handleChange('resourceLinks', {
+                      ...formData.resourceLinks,
+                      [key]: event.target.value,
+                    })
+                  }
+                  aria-label={label}
+                />
+              </div>
+            ))}
           </div>
         </div>
         </div>
