@@ -19,7 +19,8 @@ function Dashboard() {
   // Filter for posts/articles (not books)
   const posts = contents.filter((item) => {
     const hasBookSection = Array.isArray(item.sections) && item.sections.some((section) => ['Books', 'Collections', 'Educational Materials', 'Research Collections', 'Special Collections'].includes(section))
-    return item.format !== 'Collection' && !hasBookSection
+    const inGallery = Array.isArray(item.sections) && item.sections.includes('Gallery')
+    return item.format !== 'Collection' && !hasBookSection && !inGallery
   })
 
   const handleAddContent = async (formData) => {

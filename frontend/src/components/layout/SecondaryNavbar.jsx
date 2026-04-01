@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Search, ChevronDown, ArrowRight, X, Menu } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useContent } from "../../context/ContentContext";
 
 const NAV_GROUPS = [
@@ -26,7 +26,29 @@ export default function SecondaryNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [openGroup, setOpenGroup] = useState(null);
+  const closeTimerRef = useRef(null);
+  const desktopNavRef = useRef(null);
   const { normalizedContents } = useContent();
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (desktopNavRef.current && !desktopNavRef.current.contains(event.target)) {
+        setOpenGroup(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Search functionality - search across title, description, and sections
   const searchResults = useMemo(() => {
@@ -44,6 +66,30 @@ export default function SecondaryNavbar() {
 
   const slugify = (text) => text.toLowerCase().replace(/\s+/g, "-").replace(/[&]/g, "and");
 
+  const cancelClose = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const openDropdown = (title) => {
+    cancelClose();
+    setOpenGroup(title);
+  };
+
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimerRef.current = setTimeout(() => {
+      setOpenGroup(null);
+    }, 180);
+  };
+
+  const toggleDropdown = (title) => {
+    cancelClose();
+    setOpenGroup((prev) => (prev === title ? null : title));
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-[#B89B5E] bg-[#1F3A33] text-[#F3EBDD] shadow-md">
       <div className="mx-auto flex max-w-350 items-center justify-between gap-3 px-4 py-3 sm:px-6">
@@ -59,25 +105,48 @@ export default function SecondaryNavbar() {
         </NavLink>
 
         {/* Nav Links */}
-        <nav className="hidden md:flex items-center gap-3 relative">
+        <nav ref={desktopNavRef} className="hidden md:flex items-center gap-3 relative">
           {NAV_GROUPS.map((group) => (
-            <div key={group.title} className="group relative">
+            <div
+              key={group.title}
+              className="relative pb-2"
+              onMouseEnter={() => openDropdown(group.title)}
+              onMouseLeave={scheduleClose}
+            >
               {/* Parent Nav Button */}
-              <button className="flex items-center gap-1 px-4 py-2 text-[11px] md:text-[12px] font-black uppercase tracking-[0.15em] rounded transition-colors hover:bg-[#B89B5E] hover:text-[#1F3A33]">
+              <button
+                type="button"
+                onClick={() => toggleDropdown(group.title)}
+                onFocus={() => openDropdown(group.title)}
+                aria-expanded={openGroup === group.title}
+                className="flex items-center gap-1 px-4 py-2 text-[11px] md:text-[12px] font-black uppercase tracking-[0.15em] rounded transition-colors hover:bg-[#B89B5E] hover:text-[#1F3A33]"
+              >
                 {group.title}
-                <ChevronDown size={14} strokeWidth={3} className="transition-transform group-hover:rotate-180" />
+                <ChevronDown
+                  size={14}
+                  strokeWidth={3}
+                  className={`transition-transform ${openGroup === group.title ? "rotate-180" : ""}`}
+                />
               </button>
 
               {/* Dropdown Menu */}
               {/* Added 'invisible group-hover:visible' to ensure it doesn't flicker or show light text while hidden */}
-              <div className="absolute left-0 top-full w-64 mt-1 rounded-lg overflow-hidden border-2 border-[#B89B5E] 
-                              bg-[#F3EBDD] shadow-2xl transform scale-95 opacity-0 pointer-events-none 
-                              invisible group-hover:visible group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 z-50">
+              <div
+                onMouseEnter={cancelClose}
+                onMouseLeave={scheduleClose}
+                className={`absolute left-0 top-full z-50 w-64 rounded-lg overflow-hidden border-2 border-[#B89B5E]
+                            bg-[#F3EBDD] shadow-2xl transform transition-all duration-200
+                            ${openGroup === group.title
+                    ? "scale-100 opacity-100 pointer-events-auto visible"
+                    : "scale-95 opacity-0 pointer-events-none invisible"
+                  }`}
+              >
                 <ul className="flex flex-col bg-[#F3EBDD]">
                   {group.links.map((link) => (
                     <li key={link} className="border-b border-[#B89B5E]/30 last:border-0">
                       <NavLink
                         to={`/${slugify(link)}`}
+                        onClick={() => setOpenGroup(null)}
                         className={({ isActive }) =>
                           `group/item flex items-center justify-between px-4 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all
                             ${

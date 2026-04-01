@@ -192,7 +192,7 @@ export default function Navbar() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="ml-3 flex-1 text-base outline-none placeholder:text-gray-400 sm:ml-4 sm:text-lg"
+                className="ml-3 flex-1 text-base outline-none text-black placeholder:text-gray-400 sm:ml-4 sm:text-lg"
               />
               <button
                 onClick={() => setSearchOpen(false)}

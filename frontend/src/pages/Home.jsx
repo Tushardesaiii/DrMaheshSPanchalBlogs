@@ -523,7 +523,7 @@ function Home() {
           </div>
 
           <div className="relative hidden overflow-hidden py-10 md:block">
-            <div className="flex animate-float gap-8 whitespace-nowrap">
+            <div className="shelf-loop-track flex gap-8 whitespace-nowrap will-change-transform">
               {Object.entries(categoryPostsMap).concat(Object.entries(categoryPostsMap)).map(([sectionName, posts], index) => (
                 <a
                   key={`${sectionName}-${index}`}
@@ -712,7 +712,7 @@ function Home() {
 
       {/* Animation Styles + Library Aesthetic */}
       <style>{`
-        @keyframes float {
+        @keyframes shelfLoop {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
@@ -722,12 +722,15 @@ function Home() {
           50% { box-shadow: 0 0 0 8px rgba(180, 83, 9, 0); }
         }
 
-        .animate-float {
-          animation: float 40s linear infinite;
+        .shelf-loop-track {
+          animation: shelfLoop 34s linear infinite;
         }
 
-        .animate-float:hover {
-          animation-play-state: paused;
+        @media (prefers-reduced-motion: reduce) {
+          .shelf-loop-track {
+            animation-duration: 0.01ms;
+            animation-iteration-count: 1;
+          }
         }
 
         /* Library Index Card Aesthetic */
