@@ -1,9 +1,9 @@
-function Modal({ isOpen, title, description, onClose, children }) {
+function Modal({ isOpen, title, description, onClose, children, sizeClass = 'max-w-lg', panelClassName = '' }) {
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="paper-panel w-full max-w-lg">
+      <div className={`paper-panel w-full ${sizeClass} max-h-[90vh] overflow-y-auto ${panelClassName}`.trim()}>
         <div className="flex items-start justify-between">
           <div>
             <h3 className="section-title text-lg text-(--color-primary)">{title}</h3>

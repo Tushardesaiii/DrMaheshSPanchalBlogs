@@ -120,9 +120,10 @@ export function ContentProvider({ children }) {
 
   const updateContent = useCallback(async (id, updates) => {
     try {
+      const isFormData = updates instanceof FormData
       const data = await request(`/api/content/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(updates),
+        body: isFormData ? updates : JSON.stringify(updates),
       })
       const updated = data?.data
       setContents(prev =>

@@ -35,6 +35,23 @@ const parseResourceLinks = (resourceLinks) => {
   }
 };
 
+const parseJsonArrayField = (value, fieldName) => {
+  if (value === undefined) return undefined;
+  if (value === null || value === "") return [];
+  if (Array.isArray(value)) return value;
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      throw new ApiError(400, `Invalid ${fieldName} format`);
+    }
+  }
+
+  return [];
+};
+
 const sanitizeResourceLinks = (resourceLinks = [], fallbackExternalUrl = undefined) => {
   const normalizedLinks = resourceLinks
     .map((link) => {
@@ -340,17 +357,20 @@ const updateContent = asyncHandler(async (req, res) => {
     ? sanitizeRecognitionFields({ recognitionType, awardLevel, issuingOrganization })
     : null;
 
+  const parsedSections = parseJsonArrayField(sections, "sections");
+  const parsedTags = parseJsonArrayField(tags, "tags");
+
   const content = await Content.findByIdAndUpdate(
     id,
     {
       ...(title && { title: title.trim() }),
       ...(description && { description: description.trim() }),
       ...(format && { format }),
-      ...(sections && { sections: JSON.parse(sections) }),
+      ...(parsedSections !== undefined && { sections: parsedSections }),
       ...(visibility && { visibility }),
       ...(status && { status }),
       ...(files !== undefined && { files }),
-      ...(tags && { tags: JSON.parse(tags) }),
+      ...(parsedTags !== undefined && { tags: parsedTags }),
       // New fields
       ...(eventDate && { eventDate: new Date(eventDate) }),
       ...(location !== undefined && { location: location ? location.trim() : null }),

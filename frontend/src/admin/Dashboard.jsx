@@ -6,13 +6,14 @@ import Card from '../components/ui/Card'
 import Modal from '../components/ui/Modal'
 import Button from '../components/ui/Button'
 import { useContent } from '../context/ContentContext'
-import { Trash2, AlertTriangle } from 'lucide-react'
+import { Trash2, AlertTriangle, Pencil } from 'lucide-react'
 
 function Dashboard() {
-  const { contents, addContent, deleteContent, loading } = useContent()
-  const [error, setError] = useState('')
+  const { contents, addContent, updateContent, deleteContent, loading } = useContent()
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedPost, setSelectedPost] = useState(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingPost, setEditingPost] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
   // Filter for posts/articles (not books)
@@ -22,13 +23,10 @@ function Dashboard() {
   })
 
   const handleAddContent = async (formData) => {
-    setError('')
     try {
       await addContent(formData)
     } catch (error) {
       console.error('Dashboard error:', error)
-      const msg = error?.message || 'Failed to publish post'
-      setError(msg)
       throw error
     }
   }
@@ -36,6 +34,30 @@ function Dashboard() {
   const handleDeleteClick = (post) => {
     setSelectedPost(post)
     setDeleteModalOpen(true)
+  }
+
+  const handleEditClick = (post) => {
+    setEditingPost(post)
+    setEditModalOpen(true)
+  }
+
+  const handleEditCancel = () => {
+    setEditModalOpen(false)
+    setEditingPost(null)
+  }
+
+  const handleUpdateContent = async (formData) => {
+    if (!editingPost?._id) {
+      throw new Error('No post selected for editing')
+    }
+
+    try {
+      await updateContent(editingPost._id, formData)
+      handleEditCancel()
+    } catch (error) {
+      console.error('Update post error:', error)
+      throw error
+    }
   }
 
   const handleDeleteConfirm = async () => {
@@ -112,6 +134,13 @@ function Dashboard() {
                     </td>
                     <td className="py-4 text-sm">{post.visibility || 'Public'}</td>
                     <td className="py-4">
+                      <button
+                        onClick={() => handleEditClick(post)}
+                        className="rounded p-2 text-(--color-accent) hover:bg-(--admin-surface) transition-colors"
+                        title="Edit post"
+                      >
+                        <Pencil size={16} />
+                      </button>
                       <button 
                         onClick={() => handleDeleteClick(post)}
                         className="rounded p-2 text-red-600 hover:bg-red-50 transition-colors"
@@ -127,6 +156,23 @@ function Dashboard() {
           </div>
         )}
       </Card>
+
+      <Modal
+        isOpen={editModalOpen}
+        title="Edit Post"
+        description="Update this post and save changes."
+        onClose={handleEditCancel}
+        sizeClass="max-w-5xl"
+      >
+        {editingPost && (
+          <PostForm
+            mode="edit"
+            initialValues={editingPost}
+            onSubmit={handleUpdateContent}
+            onCancel={handleEditCancel}
+          />
+        )}
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal
