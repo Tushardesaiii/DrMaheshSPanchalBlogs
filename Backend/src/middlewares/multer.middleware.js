@@ -34,6 +34,14 @@ const fileFilter = (req, file, cb) => {
     } else {
       cb(new Error(`Unsupported file format: ${ext}`));
     }
+  } else if (file.fieldname === "cvFile" || file.fieldname === "cv") {
+    const allowedCvTypes = /pdf|docx?|rtf|txt|odt/;
+    const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
+    if (allowedCvTypes.test(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Unsupported CV format!"));
+    }
   } else if (file.fieldname === "video") {
     // Accept common video formats
     const allowedVideoTypes = /mp4|mov|avi|mkv|webm/;

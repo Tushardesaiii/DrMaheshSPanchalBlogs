@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import bannerRoutes from "./routes/banner.routes.js";
+import cvRoutes from "./routes/cv.routes.js";
 import { verifyJWT, verifyAdmin } from "./middlewares/auth.middleware.js";
 
 const app = express();
@@ -79,6 +80,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", verifyJWT, verifyAdmin, adminRoutes);
 app.use("/api/content", contentRoutes);
 app.use("/api/banner", bannerRoutes);
+app.use("/api/cv", cvRoutes);
 
 // --- Route Debugging Middleware ---
 app.use((req, res, next) => {
@@ -147,6 +149,7 @@ app.use((req, res) => {
       "POST /api/auth/logout",
       "GET /api/auth/me",
       "GET /api/content",
+      "GET /api/cv",
       "POST /api/content",
       "GET /api/admin/ping"
     ]

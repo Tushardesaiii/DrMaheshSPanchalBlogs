@@ -10,6 +10,7 @@ import ProtectedRoute from './ProtectedRoute'
 import Home from '../pages/Home'
 import About from '../pages/About'
 import Profile from '../pages/Profile'
+import CVPage from '../pages/CV'
 import KnowledgeHub from '../pages/KnowledgeHub'
 import DigitalLibrary from '../pages/DigitalLibrary'
 import Articles from '../pages/Articles'
@@ -25,6 +26,7 @@ import ActivityPage from '../pages/ActivityPage'
 // Admin Pages
 import Dashboard from '../admin/Dashboard'
 import AdminBanner from '../admin/Banner'
+import AdminCV from '../admin/CV'
 import AdminBooks from '../admin/Books'
 import AdminPhotos from '../admin/Photos'
 import AdminPDFs from '../admin/PDFs'
@@ -44,6 +46,7 @@ function AppRoutes() {
         {/* Informational Pages */}
         <Route path="about" element={<About />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="cv" element={<CVPage />} />
         <Route path="contact" element={<Contact />} />
         <Route path="contact-form" element={<Contact />} />
         
@@ -82,6 +85,7 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="banner" element={<AdminBanner />} />
+          <Route path="cv" element={<AdminCV />} />
           <Route path="books" element={<AdminBooks />} />
           <Route path="photos" element={<AdminPhotos />} />
           <Route path="pdfs" element={<AdminPDFs />} />

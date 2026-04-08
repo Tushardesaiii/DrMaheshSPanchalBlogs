@@ -182,6 +182,19 @@ export default function SecondaryNavbar() {
           </button>
 
           <NavLink
+            to="/cv"
+            className={({ isActive }) =>
+              `inline-flex items-center gap-2 rounded border-2 px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] transition sm:px-4 sm:text-xs ${
+                isActive
+                  ? 'border-[#B89B5E] bg-[#B89B5E] text-[#1F3A33]'
+                  : 'border-[#B89B5E] text-[#B89B5E] hover:bg-[#B89B5E] hover:text-[#1F3A33]'
+              }`
+            }
+          >
+            CV
+          </NavLink>
+
+          <NavLink
             to="/all-blogs"
             className="hidden lg:block text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] border-b-2 border-[#B89B5E] pb-0.5 hover:text-[#B89B5E] transition-colors"
           >

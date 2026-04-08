@@ -4,6 +4,7 @@ import { LayoutGrid, BookMarked, Image, FileText, MonitorPlay } from 'lucide-rea
 const adminLinks = [
   { label: 'Dashboard', to: '/admin', icon: LayoutGrid },
   { label: 'Banner', to: '/admin/banner', icon: MonitorPlay },
+  { label: 'CV', to: '/admin/cv', icon: FileText },
   { label: 'Manage Books', to: '/admin/books', icon: BookMarked },
   { label: 'Photos', to: '/admin/photos', icon: Image },
   { label: 'Manage PDFs', to: '/admin/pdfs', icon: FileText },

@@ -84,6 +84,19 @@ export default function Navbar() {
           </button>
 
           <NavLink
+            to="/cv"
+            className={({ isActive }) =>
+              `inline-flex items-center gap-2 whitespace-nowrap border px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition sm:px-4 sm:text-sm ${
+                isActive
+                  ? 'border-[#B89B5E] bg-[#B89B5E] text-[#1F3A33]'
+                  : 'border-[#B89B5E] text-[#B89B5E] hover:bg-[#B89B5E] hover:text-[#1F3A33]'
+              }`
+            }
+          >
+            CV
+          </NavLink>
+
+          <NavLink
             to="/all-blogs"
             className="text-[11px] uppercase tracking-[0.18em] border-b border-transparent hover:border-[#B89B5E] transition sm:text-sm sm:tracking-[0.25em]"
           >
